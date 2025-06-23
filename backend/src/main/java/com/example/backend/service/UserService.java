@@ -13,6 +13,8 @@ public interface UserService {
 
     public List<User> getUsers(String role);
 
+    public List<User> getAllUsers();
+
     public Boolean updateAccountStatus(Integer id, Boolean status);
 
     public void increaseFailedAttempt(User user);

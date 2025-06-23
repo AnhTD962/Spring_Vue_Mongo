@@ -8,6 +8,8 @@ import java.util.List;
 public interface UserRepository extends MongoRepository<User, String> {
     User findByEmail(String email);
 
+    List<User> findAll();
+
     List<User> findByRole(String role);
 
     User findByResetToken(String token);

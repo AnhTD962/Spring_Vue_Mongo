@@ -1,12 +1,11 @@
 package com.example.backend.controller;
 
 import com.example.backend.controller.dto.request.SigninRequestDTO;
-import com.example.backend.controller.dto.response.LoginResponseDTO;
 import com.example.backend.model.entity.User;
 import com.example.backend.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -40,9 +41,8 @@ public class AuthController {
         return "User registered successfully";
     }
 
-    // Đăng nhập
     @PostMapping("/signin")
-    public ResponseEntity<LoginResponseDTO> signin(@RequestBody SigninRequestDTO loginRequest, HttpSession session) {
+    public ResponseEntity<?> signin(@RequestBody SigninRequestDTO loginRequest, HttpSession session) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -56,12 +56,16 @@ public class AuthController {
             User user = userService.getUserByEmail(loginRequest.getEmail());
             session.setAttribute("user", user);
 
-            return ResponseEntity.ok(new LoginResponseDTO(true, "Login successful", user));
+            // ✅ Trả về thông tin user cho frontend
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Login successful",
+                    "user", user
+            ));
 
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponseDTO(false, "Invalid credentials", null));
+            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
+                    .body(Map.of("success", false, "message", "Invalid credentials"));
         }
     }
 

@@ -61,7 +61,7 @@ public class HomeController {
         if (principal != null) {
             String email = principal.getName();
             User user = userService.getUserByEmail(email);
-            Integer countCart = cartService.getCountCart(user.getId());
+            Integer countCart = cartService.getCountCart(Integer.valueOf(user.getId()));
             Map<String, Object> response = new HashMap<>();
             response.put("user", user);
             response.put("countCart", countCart);

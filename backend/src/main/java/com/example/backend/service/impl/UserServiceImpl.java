@@ -53,6 +53,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
     public Boolean updateAccountStatus(Integer id, Boolean status) {
         Optional<User> findByuser = userRepository.findById(String.valueOf(id));
 

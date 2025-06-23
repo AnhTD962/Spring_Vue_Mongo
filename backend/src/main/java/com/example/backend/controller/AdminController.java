@@ -241,8 +241,17 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers(@RequestParam Integer type) {
-        List<User> users = (type == 1) ? userService.getUsers("ROLE_USER") : userService.getUsers("ROLE_ADMIN");
+    public ResponseEntity<List<User>> getAllUsers(@RequestParam(value = "type", required = false) Integer type) {
+        List<User> users;
+
+        if (type == null) {
+            users = userService.getAllUsers(); // Ví dụ: lấy toàn bộ users
+        } else if (type == 1) {
+            users = userService.getUsers("ROLE_USER");
+        } else {
+            users = userService.getUsers("ROLE_ADMIN");
+        }
+
         return ResponseEntity.ok(users);
     }
 
