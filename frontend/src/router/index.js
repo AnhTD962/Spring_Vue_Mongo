@@ -1,134 +1,100 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { createRouter, createWebHistory } from 'vue-router'
 
-// Layouts
-import AdminLayout from '@/views/admin/AdminLayout.vue';
+// Lazy-loaded views
+const LoginView = () => import("../views/auth/LoginView.vue");
+const RegisterView = () => import("../views/auth/RegisterView.vue");
+const ForgotPasswordView = () => import("../views/auth/ForgotPasswordView.vue");
+const ResetPasswordView = () => import("../views/auth/ResetPasswordView.vue");
 
-// Views
-import HomeView from '@/views/HomeView.vue';
-import LoginView from '@/views/auth/LoginView.vue';
-import ProfileView from '@/views/user/ProfileView.vue';
-import ProductsView from '@/views/ProductsView.vue';
-import CategoriesView from '@/views/admin/CategoriesView.vue';
-import AdminProductsView from '@/views/admin/ProductsView.vue';
-import UsersView from '@/views/admin/UsersView.vue';
+const HomeView = () => import("../views/user/UserHomeView.vue");
+const UserProductListView = () => import("../views/user/ProductListView.vue");
+const UserProductDetailView = () => import("../views/user/ProductDetailView.vue");
+const CartView = () => import("../views/user/CartView.vue");
+const OrderHistoryView = () => import("../views/user/OrderHistoryView.vue");
+const UserProfileView = () => import("../views/user/ProfileView.vue");
+const ChangePasswordView = () => import("../views/user/ChangePasswordView.vue");
+
+const AdminDashboardView = () => import("../views/admin/DashboardView.vue");
+const AdminProductListView = () => import("../views/admin/ProductListView.vue");
+const AdminProductDetailView = () => import("../views/admin/ProductDetailView.vue");
+const AdminProductCreateView = () => import("../views/admin/ProductCreateView.vue");
+const AdminProductEditView = () => import("../views/admin/ProductEditView.vue");
+const AdminCategoryListView = () => import("../views/admin/CategoryListView.vue");
+const AdminCategoryCreateView = () => import("../views/admin/CategoryCreateView.vue");
+const AdminCategoryEditView = () => import("../views/admin/CategoryEditView.vue");
+const AdminUserListView = () => import("../views/admin/UserListView.vue");
+const AdminUserDetailView = () => import("../views/admin/UserDetailView.vue");
+const AdminOrderListView = () => import("../views/admin/OrderListView.vue");
+const AdminOrderDetailView = () => import("../views/admin/OrderDetailView.vue");
+
+const NotFoundView = () => import("../views/NotFoundView.vue");
 
 const routes = [
-  {
-    path: '/',
-    name: 'home',
-    component: HomeView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginView,
-    meta: { guestOnly: true }
-  },
-  {
-    path: '/profile',
-    name: 'profile',
-    component: ProfileView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/products',
-    name: 'products',
-    component: ProductsView
-  },
-  // Admin routes
-  {
-    path: '/admin',
-    component: AdminLayout,
-    meta: { requiresAuth: true, requiresAdmin: true },
-    children: [
-      {
-        path: 'categories',
-        name: 'admin-categories',
-        component: CategoriesView
-      },
-      {
-        path: 'products',
-        name: 'admin-products',
-        component: AdminProductsView
-      },
-      {
-        path: 'users',
-        name: 'admin-users',
-        component: () => import('@/views/admin/UsersView.vue')
-      },
-      // Redirect /admin to /admin/categories
-      {
-        path: '',
-        redirect: { name: 'admin-categories' }
-      }
-    ]
-  },
-  // Redirect to home for any other route
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/'
-  }
+    // Auth
+    { path: "/login", component: LoginView, meta: { guest: true } },
+    { path: "/register", component: RegisterView, meta: { guest: true } },
+    { path: "/forgot-password", component: ForgotPasswordView, meta: { guest: true } },
+    { path: "/reset-password", component: ResetPasswordView, meta: { guest: true } },
+
+    // User
+    { path: "/", redirect: "/home" },
+    { path: "/home", component: HomeView, meta: { requiresAuth: true } },
+    { path: "/products", component: UserProductListView, meta: { requiresAuth: true } },
+    { path: "/products/:id", component: UserProductDetailView, meta: { requiresAuth: true } },
+    { path: "/cart", component: CartView, meta: { requiresAuth: true } },
+    { path: "/my-orders", component: OrderHistoryView, meta: { requiresAuth: true } },
+    { path: "/profile", component: UserProfileView, meta: { requiresAuth: true } },
+    { path: "/change-password", component: ChangePasswordView, meta: { requiresAuth: true } },
+
+    // Admin
+    { path: "/admin", component: AdminDashboardView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/products", component: AdminProductListView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/products/create", component: AdminProductCreateView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/products/:id", component: AdminProductDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/products/:id/edit", component: AdminProductEditView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/categories", component: AdminCategoryListView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/categories/create", component: AdminCategoryCreateView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/categories/:id/edit", component: AdminCategoryEditView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/users", component: AdminUserListView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/users/:id", component: AdminUserDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/orders", component: AdminOrderListView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/orders/:id", component: AdminOrderDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
+
+    // 404
+    { path: "/:pathMatch(.*)*", component: NotFoundView }
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-  scrollBehavior(to, from, savedPosition) {
-    return savedPosition || { top: 0 };
-  }
+    history: createWebHistory(),
+    routes
 });
 
-// Navigation guard
-router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore();
-  
-  // Check authentication status if we have a saved user
-  if (!authStore.isAuthenticated && localStorage.getItem('user')) {
-    try {
-      const isAuthenticated = await authStore.checkAuth();
-      if (!isAuthenticated) {
-        // If checkAuth fails, clear the stored user
-        authStore.logout();
-        next('/login');
-        return;
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      authStore.logout();
-      next('/login');
-      return;
-    }
-  }
+// Route Guards
+import { useAuthStore } from '../store/auth'
+router.beforeEach((to, from, next) => {
+    const auth = useAuthStore();
 
-  // For non-authenticated routes (like login, register)
-  if (to.matched.some(record => record.meta.guestOnly)) {
-    if (authStore.isAuthenticated) {
-      // If user is already logged in, redirect to home or intended URL
-      const redirectPath = from.query.redirect || '/';
-      next(redirectPath);
-    } else {
-      next();
+    // Redirect if route requires authentication
+    if (to.meta.requiresAuth && !auth.isAuthenticated) {
+        return next('/login');
     }
-  } 
-  // For authenticated routes
-  else if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!authStore.isAuthenticated) {
-      // Redirect to login with the intended URL
-      next({
-        name: 'login',
-        query: { redirect: to.fullPath }
-      });
-    } else if (to.matched.some(record => record.meta.requiresAdmin) && !authStore.isAdmin) {
-      // If admin route but not admin, redirect to home
-      next({ name: 'home' });
-    } else {
-      next();
+
+    // Prevent logged-in users from accessing guest routes
+    if (to.meta.guest && auth.isAuthenticated) {
+        // redirect to home or admin dashboard based on role
+        if (auth.user && auth.user.role === 'ROLE_ADMIN') {
+            return next('/admin');
+        } else {
+            return next('/home');
+        }
     }
-    // Public route, allow access
+
+    // Admin route check
+    if (to.meta.requiresAdmin && (!auth.user || auth.user.role !== 'ROLE_ADMIN')) {
+        return next('/login');
+    }
+
     next();
-  }
 });
 
 export default router;

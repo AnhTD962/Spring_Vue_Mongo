@@ -60,41 +60,42 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {}) // Using our custom CORS configuration
-            .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-                .requestMatchers(
-                    "/api/**",
-                    "/error"
-                ).permitAll()
-                // Protected endpoints
-                .requestMatchers("/api/user/**").hasRole("USER")
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // All other requests should be authenticated
-                .anyRequest().authenticated()
-            )
-            // Disable form login as we're using JWT or session-based auth
-            .formLogin(form -> form.disable())
-            // Enable HTTP Basic for API access (optional)
-            .httpBasic(basic -> basic.disable())
-            // Configure logout
-            .logout(logout -> logout
-                .logoutUrl("/api/signout")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    response.setStatus(200);
-                })
-                .deleteCookies("JSESSIONID")
-                .invalidateHttpSession(true)
-                .permitAll()
-            )
-            // Handle unauthorized requests
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{ \"success\": false, \"message\": \"Unauthorized: Authentication token was either missing or invalid.\" }");
-                })
-            );
+                .cors(cors -> {
+                }) // Using our custom CORS configuration
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
+                        .requestMatchers(
+                                "/api/**",
+                                "/error"
+                        ).permitAll()
+                        // Protected endpoints
+                        .requestMatchers("/api/user/**").hasRole("USER")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // All other requests should be authenticated
+                        .anyRequest().authenticated()
+                )
+                // Disable form login as we're using JWT or session-based auth
+                .formLogin(form -> form.disable())
+                // Enable HTTP Basic for API access (optional)
+                .httpBasic(basic -> basic.disable())
+                // Configure logout
+                .logout(logout -> logout
+                        .logoutUrl("/api/signout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                        })
+                        .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true)
+                        .permitAll()
+                )
+                // Handle unauthorized requests
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{ \"success\": false, \"message\": \"Unauthorized: Authentication token was either missing or invalid.\" }");
+                        })
+                );
 
         return http.build();
     }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AdminController {
 
