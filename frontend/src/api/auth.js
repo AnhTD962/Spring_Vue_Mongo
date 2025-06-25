@@ -5,7 +5,7 @@ export function login(payload) {
 }
 
 export function register(payload) {
-    return api.post("/api/register", payload);
+    return api.post("/register", payload);
 }
 
 export function forgotPassword(email) {
@@ -21,13 +21,13 @@ export function logout() {
 }
 
 export function getProfile() {
-    return api.get("/api/user/profile");
+    return api.get("/user/profile");
 }
 
 export function updateProfile(payload) {
-    return api.put("/api/user/profile", payload);
+    return api.put("user/profile", payload);
 }
 
 export function changePassword(payload) {
-    return api.put("/api/user/change-password", payload);
+    return api.put("user/change-password", payload);
 }

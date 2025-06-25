@@ -60,25 +60,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {
-                }) // Using our custom CORS configuration
+                .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/**").hasRole("USER")
                         .requestMatchers(
-                                "/api/**",
+                                "/api/register",
+                                "/api/signin",
+                                "/api/forgot-password",
+                                "/api/reset-password",
                                 "/error"
                         ).permitAll()
-                        // Protected endpoints
-                        .requestMatchers("/api/user/**").hasRole("USER")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // All other requests should be authenticated
                         .anyRequest().authenticated()
                 )
-                // Disable form login as we're using JWT or session-based auth
                 .formLogin(form -> form.disable())
-                // Enable HTTP Basic for API access (optional)
                 .httpBasic(basic -> basic.disable())
-                // Configure logout
                 .logout(logout -> logout
                         .logoutUrl("/api/signout")
                         .logoutSuccessHandler((request, response, authentication) -> {
@@ -88,7 +84,6 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .permitAll()
                 )
-                // Handle unauthorized requests
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

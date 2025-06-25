@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -32,13 +33,18 @@ public class AuthController {
 
     // Đăng ký
     @PostMapping("/register")
-    public String registerUser(@RequestBody User user) {
+    public ResponseEntity<?> registerUser(
+            @ModelAttribute User user,
+            @RequestParam(value = "avata", required = false) MultipartFile avata
+    ) {
         if (userService.existsEmail(user.getEmail())) {
-            return "Email already exists";
+            return ResponseEntity.badRequest().body("Email already exists");
         }
-
+        if (avata != null && !avata.isEmpty()) {
+            user.setProfileImage(avata.getOriginalFilename());
+        }
         userService.saveUser(user);
-        return "User registered successfully";
+        return ResponseEntity.ok("User registered successfully");
     }
 
     @PostMapping("/signin")

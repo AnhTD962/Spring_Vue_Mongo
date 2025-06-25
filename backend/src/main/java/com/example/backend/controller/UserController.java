@@ -2,7 +2,6 @@ package com.example.backend.controller;
 
 import com.example.backend.controller.dto.request.OrderRequestDTO;
 import com.example.backend.model.entity.Cart;
-import com.example.backend.model.entity.Category;
 import com.example.backend.model.entity.Order;
 import com.example.backend.model.entity.User;
 import com.example.backend.model.enums.OrderStatus;
@@ -11,8 +10,10 @@ import com.example.backend.service.CategoryService;
 import com.example.backend.service.OrderService;
 import com.example.backend.service.UserService;
 import com.example.backend.util.CommonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -44,8 +46,11 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     @GetMapping("/profile")
-    public ResponseEntity<User> getUserProfile(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName());
+    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        user = userService.getUserByEmail(user.getName());
         return ResponseEntity.ok(user);
     }
 
