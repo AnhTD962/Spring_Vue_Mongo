@@ -34,7 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private CommonUtil commonUtil;
 
     @Override
-    public void saveOrder(Integer userid, OrderRequestDTO orderRequest) throws Exception {
+    public void saveOrder(String userid, OrderRequestDTO orderRequest) throws Exception {
 
         List<Cart> carts = cartRepository.findByUserId(userid);
 
@@ -76,14 +76,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getOrdersByUser(Integer userId) {
+    public List<Order> getOrdersByUser(String userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
         return orders;
     }
 
     @Override
-    public Order updateOrderStatus(Integer id, String status) {
-        Optional<Order> findById = orderRepository.findById(String.valueOf(id));
+    public Order updateOrderStatus(String id, String status) {
+        Optional<Order> findById = orderRepository.findById(id);
         if (findById.isPresent()) {
             Order productOrder = findById.get();
             productOrder.setStatus(status);

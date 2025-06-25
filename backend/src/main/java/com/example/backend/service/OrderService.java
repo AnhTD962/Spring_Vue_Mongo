@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface OrderService {
 
-    public void saveOrder(Integer userid, OrderRequestDTO orderRequest) throws Exception;
+    public void saveOrder(String userid, OrderRequestDTO orderRequest) throws Exception;
 
-    public List<Order> getOrdersByUser(Integer userId);
+    public List<Order> getOrdersByUser(String userId);
 
-    public Order updateOrderStatus(Integer id, String status);
+    public Order updateOrderStatus(String id, String status);
 
     public List<Order> getAllOrders();
 

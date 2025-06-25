@@ -6,12 +6,12 @@ import java.util.List;
 
 public interface CartService {
 
-    public Cart saveCart(Integer productId, Integer userId);
+    public Cart saveCart(String productId, String userId);
 
-    public List<Cart> getCartsByUser(Integer userId);
+    public List<Cart> getCartsByUser(String userId);
 
-    public Integer getCountCart(Integer userId);
+    public Integer getCountCart(String userId);
 
-    public void updateQuantity(String sy, Integer cid);
+    public void updateQuantity(String sy, String cid);
 
 }

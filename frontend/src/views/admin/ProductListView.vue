@@ -4,7 +4,7 @@
     <router-link to="/admin/products/create">Create Product</router-link>
     <ul>
       <li v-for="p in products" :key="p.id">
-        {{ p.name }}
+        {{ p.title }} - {{ p.description }} - {{ p.category }} - {{ p.price }} - {{ p.stock }} - {{ p.discount }} - {{ p.isActive }}
         <router-link :to="`/admin/products/${p.id}`">Detail</router-link>
         <router-link :to="`/admin/products/${p.id}/edit`">Edit</router-link>
         <button @click="remove(p.id)">Delete</button>

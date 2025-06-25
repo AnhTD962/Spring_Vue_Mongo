@@ -1,4 +1,5 @@
 <template>
+  <router-link to="/">← Back to Homepage</router-link>
   <div class="login-container">
     <h2>Login</h2>
     <form @submit.prevent="handleLogin">
@@ -13,7 +14,7 @@
       <div v-if="error" class="error">{{ error }}</div>
       <button type="submit">Login</button>
     </form>
-    <router-link to="/register">regiter now</router-link>
+    <router-link to="/register">Regiter now</router-link>
 
   </div>
 </template>

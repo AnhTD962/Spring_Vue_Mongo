@@ -15,7 +15,7 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-    public Boolean updateAccountStatus(Integer id, Boolean status);
+    public Boolean updateAccountStatus(String id, Boolean status);
 
     public void increaseFailedAttempt(User user);
 

@@ -92,7 +92,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/categories/{id}")
-    public ResponseEntity<?> deleteCategory(@PathVariable int id) {
+    public ResponseEntity<?> deleteCategory(@PathVariable String id) {
         boolean deleted = categoryService.deleteCategory(id);
         if (deleted) {
             return ResponseEntity.ok("Category deleted successfully");
@@ -102,7 +102,7 @@ public class AdminController {
     }
 
     @PutMapping("/categories/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable int id,
+    public ResponseEntity<?> updateCategory(@PathVariable String id,
                                             @ModelAttribute Category category,
                                             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         Category existing = categoryService.getCategoryById(id);
@@ -181,7 +181,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/products/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+    public ResponseEntity<?> deleteProduct(@PathVariable String id) {
         boolean deleted = productService.deleteProduct(id);
         if (deleted) {
             return ResponseEntity.ok("Product deleted successfully");
@@ -201,7 +201,7 @@ public class AdminController {
         }
 
         // Lấy sản phẩm hiện tại từ DB
-        Product existingProduct = productService.getProductById(Integer.valueOf(id));
+        Product existingProduct = productService.getProductById(id);
         if (existingProduct == null) {
             return ResponseEntity.notFound().build();
         }
@@ -258,7 +258,7 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}/status")
-    public ResponseEntity<String> updateUserAccountStatus(@PathVariable Integer id, @RequestParam Boolean status) {
+    public ResponseEntity<String> updateUserAccountStatus(@PathVariable String id, @RequestParam Boolean status) {
         boolean updated = userService.updateAccountStatus(id, status);
         if (updated) {
             return ResponseEntity.ok("Account Status Updated");
@@ -275,7 +275,7 @@ public class AdminController {
     }
 
     @PutMapping("/orders/{id}/status")
-    public ResponseEntity<String> updateOrderStatus(@PathVariable Integer id, @RequestParam Integer st) {
+    public ResponseEntity<String> updateOrderStatus(@PathVariable String id, @RequestParam Integer st) {
         OrderStatus[] values = OrderStatus.values();
         String status = null;
         for (OrderStatus orderSt : values) {

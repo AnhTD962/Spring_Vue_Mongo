@@ -19,3 +19,11 @@ export function updateProduct(id, payload) {
 export function deleteProduct(id) {
     return api.delete(`/admin/products/${id}`);
 }
+
+export function getViewProducts(params){
+    return api.get("/products", { params });
+}
+
+export function getViewProductDetail(id, payload){
+    return api.get(`/product/${id}`, payload);
+}

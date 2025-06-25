@@ -27,7 +27,7 @@ public class CartServiceImpl implements CartService {
     private ProductRepository productRepository;
 
     @Override
-    public Cart saveCart(Integer productId, Integer userId) {
+    public Cart saveCart(String productId, String userId) {
 
         User User = userRepository.findById(String.valueOf(userId)).get();
         Product product = productRepository.findById(String.valueOf(productId)).get();
@@ -53,7 +53,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<Cart> getCartsByUser(Integer userId) {
+    public List<Cart> getCartsByUser(String userId) {
         List<Cart> carts = cartRepository.findByUserId(userId);
 
         Double totalOrderPrice = 0.0;
@@ -70,13 +70,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Integer getCountCart(Integer userId) {
+    public Integer getCountCart(String userId) {
         Integer countByUserId = cartRepository.countByUserId(userId);
         return countByUserId;
     }
 
     @Override
-    public void updateQuantity(String sy, Integer cid) {
+    public void updateQuantity(String sy, String cid) {
 
         Cart cart = cartRepository.findById(String.valueOf(cid)).get();
         int updateQuantity;

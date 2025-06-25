@@ -58,8 +58,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateAccountStatus(Integer id, Boolean status) {
-        Optional<User> findByuser = userRepository.findById(String.valueOf(id));
+    public Boolean updateAccountStatus(String id, Boolean status) {
+        Optional<User> findByuser = userRepository.findById(id);
 
         if (findByuser.isPresent()) {
             User User = findByuser.get();

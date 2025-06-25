@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <router-link to="/admin/products">Products</router-link> |
+    <router-link to="/admin/products">Manage Products</router-link> |
     <router-link to="/admin/categories">Categories</router-link> |
     <router-link to="/admin/users">Users</router-link> |
     <router-link to="/admin/orders">Orders</router-link> 
@@ -17,7 +17,7 @@ const router = useRouter()
 
 function logout() {
   auth.logout()
-  router.push('/signin')
+  router.push('/login')
 }
 </script>
 

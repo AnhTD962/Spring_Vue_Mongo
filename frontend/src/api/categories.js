@@ -19,3 +19,7 @@ export function updateCategory(id, payload) {
 export function deleteCategory(id) {
     return api.delete(`/admin/categories/${id}`);
 }
+
+export function getViewCategories(){
+    return api.get('/categories');
+}

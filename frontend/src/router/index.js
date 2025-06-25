@@ -6,13 +6,14 @@ const RegisterView = () => import("../views/auth/RegisterView.vue");
 const ForgotPasswordView = () => import("../views/auth/ForgotPasswordView.vue");
 const ResetPasswordView = () => import("../views/auth/ResetPasswordView.vue");
 
-const HomeView = () => import("../views/user/UserHomeView.vue");
-const UserProductListView = () => import("../views/user/ProductListView.vue");
-const UserProductDetailView = () => import("../views/user/ProductDetailView.vue");
+const HomePageView = () => import("../views/HomePageView.vue");
+const UserProductListView = () => import("../views/ProductListView.vue");
+const UserProductDetailView = () => import("../views/ProductDetailView.vue");
 const CartView = () => import("../views/user/CartView.vue");
 const OrderHistoryView = () => import("../views/user/OrderHistoryView.vue");
+const OrderConfirmationView = () => import("../views/user/OrderConfirmationView.vue");
 const UserProfileView = () => import("../views/user/ProfileView.vue");
-const ChangePasswordView = () => import("../views/user/ChangePasswordView.vue");
+const ChangePasswordView = () => import("../views/user/ChangePasswordView.vue");    
 
 const AdminDashboardView = () => import("../views/admin/DashboardView.vue");
 const AdminProductListView = () => import("../views/admin/ProductListView.vue");
@@ -26,6 +27,7 @@ const AdminUserListView = () => import("../views/admin/UserListView.vue");
 const AdminUserDetailView = () => import("../views/admin/UserDetailView.vue");
 const AdminOrderListView = () => import("../views/admin/OrderListView.vue");
 const AdminOrderDetailView = () => import("../views/admin/OrderDetailView.vue");
+const CategoriesView = () => import("../views/CategoriesView.vue");
 
 const NotFoundView = () => import("../views/NotFoundView.vue");
 
@@ -38,13 +40,15 @@ const routes = [
 
     // User
     { path: "/", redirect: "/home" },
-    { path: "/home", component: HomeView, meta: { requiresAuth: true } },
-    { path: "/products", component: UserProductListView, meta: { requiresAuth: true } },
-    { path: "/products/:id", component: UserProductDetailView, meta: { requiresAuth: true } },
+    { path: "/home", component: HomePageView},
+    { path: "/products", component: UserProductListView},
+    { path: "/products/:id", component: UserProductDetailView},
     { path: "/cart", component: CartView, meta: { requiresAuth: true } },
     { path: "/my-orders", component: OrderHistoryView, meta: { requiresAuth: true } },
     { path: "/profile", component: UserProfileView, meta: { requiresAuth: true } },
     { path: "/change-password", component: ChangePasswordView, meta: { requiresAuth: true } },
+    { path: "/success", component: OrderConfirmationView, meta: {requiresAuth: true}},
+    { path: "/categories", component: CategoriesView},
 
     // Admin
     { path: "/admin", component: AdminDashboardView, meta: { requiresAuth: true, requiresAdmin: true } },

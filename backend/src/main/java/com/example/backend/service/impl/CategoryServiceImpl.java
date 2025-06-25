@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Boolean deleteCategory(int id) {
+    public Boolean deleteCategory(String id) {
         Category category = categoryRepository.findById(String.valueOf(id)).orElse(null);
 
         if (!ObjectUtils.isEmpty(category)) {
@@ -45,8 +45,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category getCategoryById(int id) {
-        Category category = categoryRepository.findById(String.valueOf(id)).orElse(null);
+    public Category getCategoryById(String id) {
+        Category category = categoryRepository.findById(id).orElse(null);
         return category;
     }
 

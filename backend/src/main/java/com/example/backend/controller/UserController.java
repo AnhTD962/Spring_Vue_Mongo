@@ -49,13 +49,8 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllActiveCategory());
-    }
-
     @PostMapping("/cart/add")
-    public ResponseEntity<?> addToCart(@RequestParam Integer pid, @RequestParam Integer uid) {
+    public ResponseEntity<?> addToCart(@RequestParam String pid, @RequestParam String uid) {
         Cart saveCart = cartService.saveCart(pid, uid);
         if (ObjectUtils.isEmpty(saveCart)) {
             return ResponseEntity.badRequest().body("Product add to cart failed");
@@ -66,25 +61,25 @@ public class UserController {
     @GetMapping("/cart")
     public ResponseEntity<List<Cart>> getCart(Principal principal) {
         User user = userService.getUserByEmail(principal.getName());
-        return ResponseEntity.ok(cartService.getCartsByUser(Integer.valueOf(user.getId())));
+        return ResponseEntity.ok(cartService.getCartsByUser(user.getId()));
     }
 
     @PutMapping("/cart/quantity")
     public ResponseEntity<?> updateCartQuantity(@RequestParam String action, @RequestParam String cartId) {
-        cartService.updateQuantity(action, Integer.valueOf(cartId));
+        cartService.updateQuantity(action, cartId);
         return ResponseEntity.ok("Quantity updated");
     }
 
     @GetMapping("/orders")
     public ResponseEntity<List<Order>> getMyOrders(Principal principal) {
         User user = userService.getUserByEmail(principal.getName());
-        return ResponseEntity.ok(orderService.getOrdersByUser(Integer.valueOf(user.getId())));
+        return ResponseEntity.ok(orderService.getOrdersByUser(user.getId()));
     }
 
     @PostMapping("/order")
     public ResponseEntity<?> placeOrder(@RequestBody OrderRequestDTO request, Principal principal) throws Exception {
         User user = userService.getUserByEmail(principal.getName());
-        orderService.saveOrder(Integer.valueOf(user.getId()), request);
+        orderService.saveOrder(user.getId(), request);
         return ResponseEntity.ok("Order placed successfully");
     }
 
@@ -98,7 +93,7 @@ public class UserController {
             }
         }
 
-        Order order = orderService.updateOrderStatus(Integer.valueOf(id), status);
+        Order order = orderService.updateOrderStatus(id, status);
         try {
             commonUtil.sendMailForProductOrder(order, status);
         } catch (Exception e) {

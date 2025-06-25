@@ -42,8 +42,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Boolean deleteProduct(Integer id) {
-        Product product = productRepository.findById(String.valueOf(id)).orElse(null);
+    public Boolean deleteProduct(String id) {
+        Product product = productRepository.findById(id).orElse(null);
 
         if (!ObjectUtils.isEmpty(product)) {
             productRepository.delete(product);
@@ -53,15 +53,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProductById(Integer id) {
-        Product product = productRepository.findById(String.valueOf(id)).orElse(null);
+    public Product getProductById(String id) {
+        Product product = productRepository.findById(id).orElse(null);
         return product;
     }
 
     @Override
     public Product updateProduct(Product product, MultipartFile image) {
 
-        Product dbProduct = getProductById(Integer.valueOf(product.getId()));
+        Product dbProduct = getProductById(product.getId());
 
         String imageName = image.isEmpty() ? dbProduct.getImage() : image.getOriginalFilename();
 
