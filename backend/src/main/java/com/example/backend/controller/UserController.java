@@ -10,7 +10,10 @@ import com.example.backend.service.CategoryService;
 import com.example.backend.service.OrderService;
 import com.example.backend.service.UserService;
 import com.example.backend.util.CommonUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -45,12 +48,17 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> getUserProfile(Principal principal, HttpServletRequest request) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        User user = userService.getUserByEmail(principal.getName());
         if (user == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
-        user = userService.getUserByEmail(user.getName());
         return ResponseEntity.ok(user);
     }
 
@@ -108,13 +116,27 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(@ModelAttribute User user, @RequestParam MultipartFile img) {
-        User updated = userService.updateUserProfile(user, img);
-        if (ObjectUtils.isEmpty(updated)) {
-            return ResponseEntity.badRequest().body("Profile update failed");
+    public ResponseEntity<?> updateProfile(
+            @ModelAttribute User user,
+            @RequestParam(value = "img", required = false) MultipartFile img,
+            Principal principal
+    ) {
+        User dbUser = userService.getUserByEmail(principal.getName());
+        if (dbUser == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
         }
+
+        // Không update email vì email là cố định để định danh user
+        user.setEmail(dbUser.getEmail());
+
+        User updated = userService.updateUserProfile(dbUser, user, img);
+        if (updated == null) {
+            return ResponseEntity.badRequest().body("Update failed");
+        }
+
         return ResponseEntity.ok(updated);
     }
+
 
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal principal) {

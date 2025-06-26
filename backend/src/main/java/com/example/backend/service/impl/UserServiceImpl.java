@@ -127,41 +127,53 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUserProfile(User user, MultipartFile img) {
-
-        User dbUser = userRepository.findById(String.valueOf(user.getId())).get();
-
-        if (!img.isEmpty()) {
-            dbUser.setProfileImage(img.getOriginalFilename());
+    public User updateUserProfile(User dbUser, User user, MultipartFile img) {
+        if (dbUser == null) {
+            throw new IllegalArgumentException("dbUser cannot be null");
         }
 
-        if (!ObjectUtils.isEmpty(dbUser)) {
-
+        if (hasText(user.getName())) {
             dbUser.setName(user.getName());
+        }
+        if (hasText(user.getMobileNumber())) {
             dbUser.setMobileNumber(user.getMobileNumber());
+        }
+        if (hasText(user.getAddress())) {
             dbUser.setAddress(user.getAddress());
+        }
+        if (hasText(user.getCity())) {
             dbUser.setCity(user.getCity());
+        }
+        if (hasText(user.getState())) {
             dbUser.setState(user.getState());
+        }
+        if (hasText(user.getPincode())) {
             dbUser.setPincode(user.getPincode());
-            dbUser = userRepository.save(dbUser);
         }
 
-        try {
-            if (!img.isEmpty()) {
+        // Handle profile image
+        if (img != null && !img.isEmpty()) {
+            try {
                 File saveFile = new ClassPathResource("static/img").getFile();
-
-                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "profile_img" + File.separator
-                        + img.getOriginalFilename());
-
-//			System.out.println(path);
+                File uploadDir = new File(saveFile, "profile_img");
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                Path path = Paths.get(uploadDir.getAbsolutePath(), img.getOriginalFilename());
                 Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                dbUser.setProfileImage("profile_img/" + img.getOriginalFilename());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        return dbUser;
+        return userRepository.save(dbUser);
     }
+
+    private boolean hasText(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
+
 
     @Override
     public User saveAdmin(User user) {

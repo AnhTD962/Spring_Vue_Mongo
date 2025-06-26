@@ -24,10 +24,14 @@ export function getProfile() {
     return api.get("/user/profile");
 }
 
-export function updateProfile(payload) {
-    return api.put("user/profile", payload);
+export function updateProfile(formData) {
+  return api.put("/user/profile", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
 }
 
 export function changePassword(payload) {
-    return api.put("user/change-password", payload);
+    return api.put("/user/change-password", payload);
 }

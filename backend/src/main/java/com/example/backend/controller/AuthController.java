@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +59,8 @@ public class AuthController {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
 
             User user = userService.getUserByEmail(loginRequest.getEmail());
             session.setAttribute("user", user);

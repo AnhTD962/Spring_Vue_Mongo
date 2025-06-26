@@ -11,6 +11,8 @@ import com.example.backend.util.CommonUtil;
 import io.micrometer.common.util.StringUtils;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -58,16 +60,16 @@ public class HomeController {
 
     @GetMapping("/user")
     public ResponseEntity<?> getUserDetails(Principal principal) {
-        if (principal != null) {
-            String email = principal.getName();
-            User user = userService.getUserByEmail(email);
-            Integer countCart = cartService.getCountCart(user.getId());
-            Map<String, Object> response = new HashMap<>();
-            response.put("user", user);
-            response.put("countCart", countCart);
-            return ResponseEntity.ok(response);
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        String email = principal.getName();
+        User user = userService.getUserByEmail(email);
+        Integer countCart = cartService.getCountCart(user.getId());
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", user);
+        response.put("countCart", countCart);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/categories")

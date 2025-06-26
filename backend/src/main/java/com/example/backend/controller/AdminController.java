@@ -337,13 +337,20 @@ public class AdminController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<String> updateProfile(@ModelAttribute User user, @RequestParam MultipartFile img) {
-        User updateUserProfile = userService.updateUserProfile(user, img);
-        if (ObjectUtils.isEmpty(updateUserProfile)) {
-            return ResponseEntity.internalServerError().body("Profile not updated");
-        } else {
-            return ResponseEntity.ok("Profile Updated");
+    public ResponseEntity<?> updateProfile(
+            @ModelAttribute User user,
+            @RequestParam(required = false) MultipartFile img,
+            Principal principal
+    ) {
+        User dbUser = userService.getUserByEmail(principal.getName());
+        if (dbUser == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
         }
+        User updated = userService.updateUserProfile(dbUser, user, img);
+        if (ObjectUtils.isEmpty(updated)) {
+            return ResponseEntity.badRequest().body("Profile update failed");
+        }
+        return ResponseEntity.ok(updated);
     }
 
     @PutMapping("/change-password")

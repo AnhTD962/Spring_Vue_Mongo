@@ -3,7 +3,11 @@
     <h2>User Detail</h2>
     <p><b>Name:</b> {{ user.name }}</p>
     <p><b>Email:</b> {{ user.email }}</p>
-    <p><b>Status:</b> {{ user.status }}</p>
+    <p><b>Status:</b> {{ user.mobileNumber }}</p>
+    <p><b>Status:</b> {{ user.address }}</p>
+    <p><b>Status:</b> {{ user.state }}</p>
+    <p><b>Status:</b> {{ user.pincode }}</p>
+    <p><b>Status:</b> {{ user.profileImage }}</p>
   </div>
 </template>
 <script setup>
