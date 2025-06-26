@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CartRepository extends MongoRepository<Cart, String> {
 
-    Cart findByProductIdAndUserId(String productId, String userId);
+    List<Cart> findByProductIdAndUserId(String productId, String userId);
 
     Integer countByUserId(String userId);
 

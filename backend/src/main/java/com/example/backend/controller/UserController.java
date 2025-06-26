@@ -1,6 +1,9 @@
 package com.example.backend.controller;
 
+import com.example.backend.controller.dto.request.CartRequestDTO;
 import com.example.backend.controller.dto.request.OrderRequestDTO;
+import com.example.backend.controller.dto.response.CartListResponseDTO;
+import com.example.backend.controller.dto.response.CartResponseDTO;
 import com.example.backend.model.entity.Cart;
 import com.example.backend.model.entity.Order;
 import com.example.backend.model.entity.User;
@@ -16,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -63,8 +66,12 @@ public class UserController {
     }
 
     @PostMapping("/cart/add")
-    public ResponseEntity<?> addToCart(@RequestParam String pid, @RequestParam String uid) {
-        Cart saveCart = cartService.saveCart(pid, uid);
+    public ResponseEntity<?> addToCart(@RequestBody CartRequestDTO request) {
+        Cart saveCart = cartService.saveCart(
+            request.getPid(), 
+            request.getUid(), 
+            request.getQuantity()
+        );
         if (ObjectUtils.isEmpty(saveCart)) {
             return ResponseEntity.badRequest().body("Product add to cart failed");
         }
@@ -72,15 +79,24 @@ public class UserController {
     }
 
     @GetMapping("/cart")
-    public ResponseEntity<List<Cart>> getCart(Principal principal) {
+    public ResponseEntity<CartListResponseDTO> getCart(Principal principal) {
         User user = userService.getUserByEmail(principal.getName());
-        return ResponseEntity.ok(cartService.getCartsByUser(user.getId()));
+        return ResponseEntity.ok(cartService.getCartWithTotal(user.getId()));
     }
 
-    @PutMapping("/cart/quantity")
-    public ResponseEntity<?> updateCartQuantity(@RequestParam String action, @RequestParam String cartId) {
-        cartService.updateQuantity(action, cartId);
-        return ResponseEntity.ok("Quantity updated");
+    @PutMapping("/cart/{cartId}")
+    public ResponseEntity<?> updateCartQuantity(
+            @PathVariable String cartId,
+            @RequestParam int quantity
+    ) {
+        cartService.updateCartQuantityById(cartId, quantity);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/cart/{cartId}")
+    public ResponseEntity<?> deleteCartById(@PathVariable String cartId) {
+        cartService.deleteCartById(cartId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/orders")
@@ -136,7 +152,6 @@ public class UserController {
 
         return ResponseEntity.ok(updated);
     }
-
 
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal principal) {

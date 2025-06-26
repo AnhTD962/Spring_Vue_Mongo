@@ -1,17 +1,20 @@
 import api from "./axios";
 
 export function getCart() {
-    return api.get("/cart");
+  return api.get("/user/cart");
 }
 
 export function addToCart(payload) {
-    return api.post("/cart", payload);
+  return api.post("/user/cart/add", {
+    pid: payload.productId,
+    uid: payload.userId,
+  });
 }
 
-export function updateCartItem(id, payload) {
-    return api.put(`/cart/${id}`, payload);
+export function updateCartQuantity(cartId, quantity) {
+  return api.put(`/user/cart/${cartId}?quantity=${quantity}`);
 }
 
-export function removeCartItem(id) {
-    return api.delete(`/cart/${id}`);
+export function removeCartItem(cartId) {
+  return api.delete(`/user/cart/${cartId}`);
 }
