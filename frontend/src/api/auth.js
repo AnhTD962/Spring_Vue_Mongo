@@ -35,3 +35,4 @@ export function updateProfile(formData) {
 export function changePassword(payload) {
     return api.put("/user/change-password", payload);
 }
+

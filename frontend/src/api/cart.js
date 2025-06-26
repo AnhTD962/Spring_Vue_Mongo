@@ -8,6 +8,7 @@ export function addToCart(payload) {
   return api.post("/user/cart/add", {
     pid: payload.productId,
     uid: payload.userId,
+    quantity: payload.quantity 
   });
 }
 

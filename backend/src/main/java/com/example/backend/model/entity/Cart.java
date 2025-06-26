@@ -1,7 +1,5 @@
 package com.example.backend.model.entity;
 
-//import jakarta.persistence.*;
-
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "carts")
-//@Table(name = "carts")
-//@Entity
 public class Cart {
 
     @Id
@@ -35,21 +31,4 @@ public class Cart {
     @Transient
     private Double totalOrderPrice;
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
-//
-//    @ManyToOne
-//    private User user;
-//
-//    @ManyToOne
-//    private Product product;
-//
-//    private Integer quantity;
-//
-//    @Transient
-//    private Double totalPrice;
-//
-//    @Transient
-//    private Double totalOrderPrice;
 }

@@ -11,8 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "categories")
-//@Table(name = "categories")
-//@Entity
 public class Category {
 
     @Id
@@ -26,13 +24,4 @@ public class Category {
     @Field("is_active")
     private Boolean isActive;
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
-//
-//    private String name;
-//
-//    private String imageName;
-//
-//    private Boolean isActive;
 }

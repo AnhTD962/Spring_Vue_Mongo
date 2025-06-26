@@ -13,8 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @Data
 @Document(collection = "products")
-//@Table(name = "products")
-//@Entity
 public class Product {
 
     @Id
@@ -47,27 +45,5 @@ public class Product {
 
     @Field("is_active")
     private Boolean isActive;
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
-//
-//    @Column(length = 500)
-//    private String title;
-//
-//    @Column(length = 5000)
-//    private String description;
-//
-//    private String category;
-//
-//    private Double price;
-//
-//    private int stock;
-//
-//    private String image;
-//
-//    private int discount;
-//
-//    private Double discountPrice;
-//
-//    private Boolean isActive;
+
 }

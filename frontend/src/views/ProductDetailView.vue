@@ -65,7 +65,11 @@ async function handleAddToCart() {
     });
     return;
   }
-  await addToCart({ productId: product.value.id, quantity: quantity.value });
+  await addToCart({
+    productId: product.value.id,
+    userId: auth.user.id,
+    quantity: quantity.value
+  });
   alert("Added to cart!");
 }
 </script>

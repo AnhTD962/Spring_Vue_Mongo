@@ -3,7 +3,7 @@
     <h2>My Orders</h2>
     <ul>
       <li v-for="o in orders" :key="o.id">
-        Order #{{ o.id }} - {{ o.status }}
+        Order #{{ o.orderId }} - {{ o.status }}
         <router-link :to="`/my-orders/${o.id}`">Detail</router-link>
       </li>
     </ul>

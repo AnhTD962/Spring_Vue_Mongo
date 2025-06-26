@@ -3,7 +3,6 @@ package com.example.backend.controller;
 import com.example.backend.controller.dto.request.CartRequestDTO;
 import com.example.backend.controller.dto.request.OrderRequestDTO;
 import com.example.backend.controller.dto.response.CartListResponseDTO;
-import com.example.backend.controller.dto.response.CartResponseDTO;
 import com.example.backend.model.entity.Cart;
 import com.example.backend.model.entity.Order;
 import com.example.backend.model.entity.User;
@@ -26,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -93,6 +91,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/cart/count")
+    public ResponseEntity<?> getCountCart(Principal principal) {
+        User user = userService.getUserByEmail(principal.getName());
+        return ResponseEntity.ok(cartService.getCountCart(user.getId()));
+    }
+
     @DeleteMapping("/cart/{cartId}")
     public ResponseEntity<?> deleteCartById(@PathVariable String cartId) {
         cartService.deleteCartById(cartId);
@@ -117,7 +121,7 @@ public class UserController {
         OrderStatus[] values = OrderStatus.values();
         String status = null;
         for (OrderStatus orderStatus : values) {
-            if (orderStatus.getId().equals(statusId)) {
+            if (orderStatus.getId() == statusId) {
                 status = orderStatus.getName();
             }
         }

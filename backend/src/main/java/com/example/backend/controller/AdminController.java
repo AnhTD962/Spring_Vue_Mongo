@@ -267,56 +267,56 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/orders")
-    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
-                                                    @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
-        Page<Order> page = orderService.getAllOrdersPagination(pageNo, pageSize);
-        return ResponseEntity.ok(page);
-    }
-
-    @PutMapping("/orders/{id}/status")
-    public ResponseEntity<String> updateOrderStatus(@PathVariable String id, @RequestParam Integer st) {
-        OrderStatus[] values = OrderStatus.values();
-        String status = null;
-        for (OrderStatus orderSt : values) {
-            if (orderSt.getId().equals(st)) {
-                status = orderSt.getName();
-                break;
-            }
-        }
-
-        if (status == null) {
-            return ResponseEntity.badRequest().body("Invalid status value");
-        }
-
-        Order updateOrder = orderService.updateOrderStatus(id, status);
-
-        try {
-            commonUtil.sendMailForProductOrder(updateOrder, status);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (!ObjectUtils.isEmpty(updateOrder)) {
-            return ResponseEntity.ok("Status Updated");
-        } else {
-            return ResponseEntity.internalServerError().body("Status not updated");
-        }
-    }
-
-    @GetMapping("/orders/search")
-    public ResponseEntity<?> searchOrder(@RequestParam String orderId) {
-        if (orderId == null || orderId.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Order ID is required");
-        }
-
-        Order order = orderService.getOrdersByOrderId(orderId.trim());
-        if (ObjectUtils.isEmpty(order)) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(order);
-        }
-    }
+//    @GetMapping("/orders")
+//    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+//                                                    @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+//        Page<Order> page = orderService.getAllOrdersPagination(pageNo, pageSize);
+//        return ResponseEntity.ok(page);
+//    }
+//
+//    @PutMapping("/orders/{id}/status")
+//    public ResponseEntity<String> updateOrderStatus(@PathVariable String id, @RequestParam Integer st) {
+//        OrderStatus[] values = OrderStatus.values();
+//        String status = null;
+//        for (OrderStatus orderSt : values) {
+//            if (orderSt.getId() == st) {
+//                status = orderSt.getName();
+//                break;
+//            }
+//        }
+//
+//        if (status == null) {
+//            return ResponseEntity.badRequest().body("Invalid status value");
+//        }
+//
+//        Order updateOrder = orderService.updateOrderStatus(id, status);
+//
+//        try {
+//            commonUtil.sendMailForProductOrder(updateOrder, status);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (!ObjectUtils.isEmpty(updateOrder)) {
+//            return ResponseEntity.ok("Status Updated");
+//        } else {
+//            return ResponseEntity.internalServerError().body("Status not updated");
+//        }
+//    }
+//
+//    @GetMapping("/orders/search")
+//    public ResponseEntity<?> searchOrder(@RequestParam String orderId) {
+//        if (orderId == null || orderId.trim().isEmpty()) {
+//            return ResponseEntity.badRequest().body("Order ID is required");
+//        }
+//
+//        Order order = orderService.getOrdersByOrderId(orderId.trim());
+//        if (ObjectUtils.isEmpty(order)) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(order);
+//        }
+//    }
 
     @PostMapping("/admins")
     public ResponseEntity<String> saveAdmin(@ModelAttribute User user, @RequestParam("img") MultipartFile file) throws IOException {

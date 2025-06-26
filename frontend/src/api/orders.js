@@ -16,3 +16,7 @@ export function updateOrderStatus(id, status) {
 export function getMyOrders() {
     return api.get("/user/orders");
 }
+
+export function checkoutCart(payload){
+    return api.post("/user/order", payload);
+}

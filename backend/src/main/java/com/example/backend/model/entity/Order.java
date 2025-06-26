@@ -1,6 +1,6 @@
 package com.example.backend.model.entity;
 
-//import jakarta.persistence.*;
+import com.example.backend.model.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,14 +9,13 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "orders")
-//@Table(name = "orders")
-//@Entity
 public class Order {
 
     @Id
@@ -26,19 +25,16 @@ public class Order {
     private String orderId;
 
     @Field("order_date")
-    private LocalDate orderDate;
-
-    @DBRef
-    private Product product;
-
-    private Double price;
-
-    private Integer quantity;
+    private LocalDateTime orderDate;
 
     @DBRef
     private User user;
 
-    private String status;
+    private List<OrderItem> items;
+
+    private Double total;
+
+    private OrderStatus status;
 
     @Field("payment_type")
     private String paymentType;
@@ -46,28 +42,4 @@ public class Order {
     @DBRef
     private OrderAddress orderAddress;
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
-//
-//    private String orderId;
-//
-//    private LocalDate orderDate;
-//
-//    @ManyToOne
-//    private Product product;
-//
-//    private Double price;
-//
-//    private Integer quantity;
-//
-//    @ManyToOne
-//    private User user;
-//
-//    private String status;
-//
-//    private String paymentType;
-//
-//    @OneToOne(cascade = CascadeType.ALL)
-//    private OrderAddress orderAddress;
 }

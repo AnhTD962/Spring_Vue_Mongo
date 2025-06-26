@@ -1,6 +1,5 @@
 package com.example.backend.model.entity;
 
-//import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "order_addresses")
-//@Table(name = "orders_address")
-//@Entity
 public class OrderAddress {
 
     @Id
@@ -36,23 +33,4 @@ public class OrderAddress {
 
     private String state;
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Integer id;
-//
-//    private String firstName;
-//
-//    private String lastName;
-//
-//    private String email;
-//
-//    private String mobileNo;
-//
-//    private String address;
-//
-//    private String city;
-//
-//    private String state;
-//
-//    private String pincode;
 }
