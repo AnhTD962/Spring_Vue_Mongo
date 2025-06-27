@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { login as apiLogin, logout as apiLogout, getProfile } from "../api/auth";
+import { login as apiLogin, logout as apiLogout, getUserProfile } from "../api/auth";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -13,14 +13,14 @@ export const useAuthStore = defineStore("auth", {
         async login(payload) {
             const { data } = await apiLogin(payload);
             if (data.success) {
-                this.user = data.user; // Should contain role property!
+                this.user = data.user; 
                 localStorage.setItem("user", JSON.stringify(data.user));
             } else {
                 throw new Error(data.message || "Login failed");
             }
         },
         async fetchProfile() {
-            const { data } = await getProfile();
+            const { data } = await getUserProfile();
             this.user = data;
             localStorage.setItem("user", JSON.stringify(data));
         },

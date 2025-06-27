@@ -12,7 +12,7 @@
       <div>Pin code: <input v-model="profile.pincode" placeholder="Pin code" /></div>
       <button type="submit">Save</button>
       <div>
-        <router-link to="/change-password">
+        <router-link to="/user-change-password">
           <button type="button">Change Password</button>
         </router-link>
       </div>
@@ -23,14 +23,14 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { getProfile, updateProfile } from "../../api/auth";
+import { getUserProfile, updateUserProfile } from "../../api/auth";
 
 const profile = ref(null);
 const msg = ref("");
 const selectedImg = ref(null);
 
 onMounted(async () => {
-  const { data } = await getProfile();
+  const { data } = await getUserProfile();
   profile.value = data;
 });
 
@@ -53,7 +53,7 @@ async function save() {
     formData.append("img", selectedImg.value);
   }
 
-  await updateProfile(formData);
+  await updateUserProfile(formData);
   msg.value = "Profile updated!";
 }
 </script>

@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.controller.dto.request.OrderRequestDTO;
+import com.example.backend.controller.dto.response.OrderDetailResponseDTO;
 import com.example.backend.model.entity.Order;
 import org.springframework.data.domain.Page;
 
@@ -20,4 +21,6 @@ public interface OrderService {
     public Order getOrdersByOrderId(String orderId);
 
     public Page<Order> getAllOrdersPagination(Integer pageNo, Integer pageSize);
+
+    public OrderDetailResponseDTO getOrderDetail(String id);
 }

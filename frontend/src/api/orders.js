@@ -20,3 +20,7 @@ export function getMyOrders() {
 export function checkoutCart(payload){
     return api.post("/user/order", payload);
 }
+
+export function getMyOrderDetail(id) {
+  return api.get(`user/orders/${id}`)
+}

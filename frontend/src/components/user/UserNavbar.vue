@@ -1,10 +1,11 @@
 <template>
   <nav>
+    <router-link to="/home">Home</router-link> |
     <router-link to="/products">Products</router-link> |
     <router-link to="/categories">Categories</router-link> |
     <router-link to="/cart">Cart</router-link> |
     <router-link to="/my-orders">Orders</router-link> |
-    <router-link to="/profile">Profile</router-link> 
+    <router-link to="/user-profile">Profile</router-link> 
     <button @click="logout" class="logout-btn">Logout</button>
   </nav>
 </template>

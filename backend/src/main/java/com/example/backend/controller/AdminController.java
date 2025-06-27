@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.model.entity.Category;
 import com.example.backend.model.entity.Order;
 import com.example.backend.model.entity.Product;
@@ -7,6 +8,7 @@ import com.example.backend.model.entity.User;
 import com.example.backend.model.enums.OrderStatus;
 import com.example.backend.service.*;
 import com.example.backend.util.CommonUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
@@ -168,16 +170,14 @@ public class AdminController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<Page<Product>> getProducts(@RequestParam(defaultValue = "") String ch,
-                                                     @RequestParam(defaultValue = "0") Integer pageNo,
-                                                     @RequestParam(defaultValue = "10") Integer pageSize) {
-        Page<Product> page;
+    public ResponseEntity<List<Product>> getProducts(@RequestParam(defaultValue = "") String ch) {
+        List<Product> listProducts;
         if (ch != null && !ch.trim().isEmpty()) {
-            page = productService.searchProductPagination(pageNo, pageSize, ch);
+            listProducts = productService.searchProduct(ch);
         } else {
-            page = productService.getAllProductsPagination(pageNo, pageSize);
+            listProducts = productService.getAllProducts();
         }
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(listProducts);
     }
 
     @DeleteMapping("/products/{id}")
@@ -336,42 +336,49 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<?> getAdminProfile(Principal principal, HttpServletRequest request) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        User user = userService.getUserByEmail(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        return ResponseEntity.ok(user);
+    }
+
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(
             @ModelAttribute User user,
-            @RequestParam(required = false) MultipartFile img,
+            @RequestParam(value = "img", required = false) MultipartFile img,
             Principal principal
     ) {
         User dbUser = userService.getUserByEmail(principal.getName());
         if (dbUser == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
+
+        // Không update email vì email là cố định để định danh user
+        user.setEmail(dbUser.getEmail());
+
         User updated = userService.updateUserProfile(dbUser, user, img);
-        if (ObjectUtils.isEmpty(updated)) {
-            return ResponseEntity.badRequest().body("Profile update failed");
+        if (updated == null) {
+            return ResponseEntity.badRequest().body("Update failed");
         }
+
         return ResponseEntity.ok(updated);
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestParam String newPassword,
-                                                 @RequestParam String currentPassword,
-                                                 Principal p) {
-        User loggedInUserDetails = commonUtil.getLoggedInUserDetails(p);
-        boolean matches = passwordEncoder.matches(currentPassword, loggedInUserDetails.getPassword());
-
-        if (matches) {
-            String encodePassword = passwordEncoder.encode(newPassword);
-            loggedInUserDetails.setPassword(encodePassword);
-            User updateUser = userService.updateUser(loggedInUserDetails);
-
-            if (ObjectUtils.isEmpty(updateUser)) {
-                return ResponseEntity.internalServerError().body("Password not updated !! Error in server");
-            } else {
-                return ResponseEntity.ok("Password Updated successfully");
-            }
-        } else {
-            return ResponseEntity.badRequest().body("Current Password incorrect");
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request, Principal principal) {
+        User user = userService.getUserByEmail(principal.getName());
+        boolean matches = passwordEncoder.matches(request.getCurrentPassword(), user.getPassword());
+        if (!matches) {
+            return ResponseEntity.badRequest().body("Current password is incorrect");
         }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userService.updateUser(user);
+        return ResponseEntity.ok("Password changed successfully");
     }
 }

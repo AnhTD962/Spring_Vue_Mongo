@@ -20,8 +20,8 @@ export function deleteProduct(id) {
     return api.delete(`/admin/products/${id}`);
 }
 
-export function getViewProducts(params){
-    return api.get("/products", { params });
+export function getViewProducts(){
+    return api.get("/products");
 }
 
 export function getViewProductDetail(id, payload){

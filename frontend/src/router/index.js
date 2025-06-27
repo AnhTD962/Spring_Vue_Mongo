@@ -12,6 +12,8 @@ const OrderHistoryView = () => import("../views/user/OrderHistoryView.vue");
 const OrderConfirmationView = () => import("../views/user/OrderConfirmationView.vue");
 const UserProfileView = () => import("../views/user/ProfileView.vue");
 const ChangePasswordView = () => import("../views/user/ChangePasswordView.vue");    
+const OrderDetailView = () => import("../views/user/OrderDetailView.vue")
+const ProductsByCategoryView = () => import('../views/ProductsByCategoryView.vue');
 
 const AdminProductListView = () => import("../views/admin/ProductListView.vue");
 const AdminProductDetailView = () => import("../views/admin/ProductDetailView.vue");
@@ -24,6 +26,8 @@ const AdminUserListView = () => import("../views/admin/UserListView.vue");
 const AdminUserDetailView = () => import("../views/admin/UserDetailView.vue");
 const AdminOrderListView = () => import("../views/admin/OrderListView.vue");
 const AdminOrderDetailView = () => import("../views/admin/OrderDetailView.vue");
+const AdminProfileView = () => import("../views/admin/AdminProfileView.vue");
+const AdminChangePasswordView = () => import("../views/admin/ChangeAdminPasswordView.vue")
 const CategoriesView = () => import("../views/CategoriesView.vue");
 
 const NotFoundView = () => import("../views/NotFoundView.vue");
@@ -40,10 +44,13 @@ const routes = [
     { path: "/products/:id", component: UserProductDetailView},
     { path: "/cart", component: CartView, meta: { requiresAuth: true } },
     { path: "/my-orders", component: OrderHistoryView, meta: { requiresAuth: true } },
-    { path: "/profile", component: UserProfileView, meta: { requiresAuth: true } },
-    { path: "/change-password", component: ChangePasswordView, meta: { requiresAuth: true } },
+    { path: "/user-profile", component: UserProfileView, meta: { requiresAuth: true } },
+    { path: "/user-change-password", component: ChangePasswordView, meta: { requiresAuth: true } },
     { path: "/success", component: OrderConfirmationView, meta: {requiresAuth: true}},
+    { path: "/my-orders/:id", component: OrderDetailView, meta: {requiresAuth: true}},
     { path: "/categories", component: CategoriesView},
+    { path: '/categories/:id', component: ProductsByCategoryView},
+    
 
     // Admin
     { path: "/admin/products", component: AdminProductListView, meta: { requiresAuth: true, requiresAdmin: true } },
@@ -57,6 +64,8 @@ const routes = [
     { path: "/admin/users/:id", component: AdminUserDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/orders", component: AdminOrderListView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/orders/:id", component: AdminOrderDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin-change-password", component: AdminChangePasswordView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin-profile", component: AdminProfileView, meta: { requiresAuth: true, requiresAdmin: true } },
 
     // 404
     { path: "/:pathMatch(.*)*", component: NotFoundView }

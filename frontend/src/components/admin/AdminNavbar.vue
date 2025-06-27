@@ -4,7 +4,7 @@
     <router-link to="/admin/categories">Manage Categories</router-link> |
     <router-link to="/admin/users">Manage Users</router-link> |
     <router-link to="/admin/orders">Manage Orders</router-link> |
-    <router-link to="/admin/profile">Profile</router-link> 
+    <router-link to="/admin-profile">Profile</router-link> 
     <button @click="logout" class="logout-btn">Logout</button>
   </nav>
 </template>

@@ -3,7 +3,7 @@
     <h2>Categories</h2>
     <ul>
       <li v-for="c in categories" :key="c.id">
-        <router-link :to="`/admin/categories/${c.id}/edit`">
+        <router-link :to="`/categories/${c.name}`">
           <img v-if="c.image" :src="getCategoryImgUrl(c.image)" alt="Category Image"
             style="width: 120px; height: auto;" />
           <div>Name: {{ c.name }}</div>

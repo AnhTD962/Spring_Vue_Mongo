@@ -1,6 +1,7 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.controller.dto.request.OrderRequestDTO;
+import com.example.backend.controller.dto.response.OrderDetailResponseDTO;
 import com.example.backend.model.entity.*;
 import com.example.backend.model.enums.OrderStatus;
 import com.example.backend.repository.CartRepository;
@@ -120,5 +121,52 @@ public class OrderServiceImpl implements OrderService {
     public Page<Order> getAllOrdersPagination(Integer pageNo, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("orderDate").descending());
         return orderRepository.findAll(pageable);
+    }
+
+    @Override
+    public OrderDetailResponseDTO getOrderDetail(String id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        OrderDetailResponseDTO dto = new OrderDetailResponseDTO();
+        dto.setId(order.getId());
+        dto.setOrderId(order.getOrderId());
+        dto.setOrderDate(order.getOrderDate());
+        dto.setStatus(order.getStatus().name());
+        dto.setPaymentType(order.getPaymentType());
+        dto.setTotal(order.getTotal());
+
+        // User info
+        OrderDetailResponseDTO.UserDTO userDto = new OrderDetailResponseDTO.UserDTO();
+        userDto.setName(order.getUser().getName());
+        userDto.setEmail(order.getUser().getEmail());
+        userDto.setMobileNumber(order.getUser().getMobileNumber());
+        dto.setUser(userDto);
+
+        // Address info
+        OrderAddress a = order.getOrderAddress();
+        OrderDetailResponseDTO.AddressDTO addressDto = new OrderDetailResponseDTO.AddressDTO();
+        addressDto.setFirstName(a.getFirstName());
+        addressDto.setLastName(a.getLastName());
+        addressDto.setEmail(a.getEmail());
+        addressDto.setMobileNo(a.getMobileNo());
+        addressDto.setAddress(a.getAddress());
+        addressDto.setCity(a.getCity());
+        addressDto.setState(a.getState());
+        dto.setAddress(addressDto);
+
+        // Items
+        List<OrderDetailResponseDTO.ItemDTO> itemDTOs = order.getItems().stream().map(item -> {
+            OrderDetailResponseDTO.ItemDTO i = new OrderDetailResponseDTO.ItemDTO();
+            i.setProductId(item.getProduct().getId());
+            i.setProductName(item.getProduct().getTitle());
+            i.setPrice(item.getPrice());
+            i.setQuantity(item.getQuantity());
+            i.setTotal(item.getTotal());
+            return i;
+        }).toList();
+
+        dto.setItems(itemDTOs);
+        return dto;
     }
 }

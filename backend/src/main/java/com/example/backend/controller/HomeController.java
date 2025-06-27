@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.controller.dto.request.ProductWithCategoryDTO;
 import com.example.backend.model.entity.Category;
 import com.example.backend.model.entity.Product;
 import com.example.backend.model.entity.User;
@@ -78,22 +79,8 @@ public class HomeController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<?> getProducts(
-            @RequestParam(defaultValue = "") String category,
-            @RequestParam(defaultValue = "0") int pageNo,
-            @RequestParam(defaultValue = "12") int pageSize,
-            @RequestParam(defaultValue = "") String ch
-    ) {
-        Page<Product> page = StringUtils.isEmpty(ch)
-                ? productService.getAllActiveProductPagination(pageNo, pageSize, category)
-                : productService.searchActiveProductPagination(pageNo, pageSize, category, ch);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("products", page.getContent());
-        response.put("pageNo", page.getNumber());
-        response.put("totalPages", page.getTotalPages());
-        response.put("totalElements", page.getTotalElements());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<Product>> getProducts() {
+        return ResponseEntity.ok(productService.findByIsActiveTrue());
     }
 
     @GetMapping("/product/{id}")
@@ -122,6 +109,12 @@ public class HomeController {
         }
 
         return ResponseEntity.ok(savedUser);
+    }
+
+    @GetMapping("/categories/{categoryName}")
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable String categoryName) {
+        List<Product> products = productService.getProductsByCategory(categoryName);
+        return ResponseEntity.ok(products);
     }
 
     @PostMapping("/forgot-password")

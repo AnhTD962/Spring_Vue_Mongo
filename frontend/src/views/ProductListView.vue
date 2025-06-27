@@ -18,6 +18,6 @@ import { getViewProducts } from "../api/products";
 const products = ref([]);
 onMounted(async () => {
   const { data } = await getViewProducts();
-  products.value = data.products;
+  products.value = data;
 });
 </script>

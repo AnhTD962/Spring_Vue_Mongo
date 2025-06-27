@@ -4,6 +4,7 @@ import com.example.backend.controller.dto.request.CartRequestDTO;
 import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.controller.dto.request.OrderRequestDTO;
 import com.example.backend.controller.dto.response.CartListResponseDTO;
+import com.example.backend.controller.dto.response.OrderDetailResponseDTO;
 import com.example.backend.model.entity.Cart;
 import com.example.backend.model.entity.Order;
 import com.example.backend.model.entity.User;
@@ -117,23 +118,9 @@ public class UserController {
         return ResponseEntity.ok("Order placed successfully");
     }
 
-    @PutMapping("/order/status")
-    public ResponseEntity<?> updateOrderStatus(@RequestParam String id, @RequestParam Integer statusId) {
-        OrderStatus[] values = OrderStatus.values();
-        String status = null;
-        for (OrderStatus orderStatus : values) {
-            if (orderStatus.getId() == statusId) {
-                status = orderStatus.getName();
-            }
-        }
-
-        Order order = orderService.updateOrderStatus(id, status);
-        try {
-            commonUtil.sendMailForProductOrder(order, status);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok(order);
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<OrderDetailResponseDTO> getOrderById(@PathVariable String id) {
+        return ResponseEntity.ok(orderService.getOrderDetail(id));
     }
 
     @PutMapping("/profile")

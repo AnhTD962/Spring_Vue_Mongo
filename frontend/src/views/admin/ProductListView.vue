@@ -19,7 +19,7 @@ import { getProducts, deleteProduct } from "../../api/products";
 const products = ref([]);
 async function fetch() {
   const { data } = await getProducts();
-  products.value = data.products;
+  products.value = data;
 }
 onMounted(fetch);
 

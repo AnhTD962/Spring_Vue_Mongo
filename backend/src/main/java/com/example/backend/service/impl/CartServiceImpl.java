@@ -35,20 +35,39 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Default quantity to 1 if invalid (null or less than 1)
         int qty = (quantity == null || quantity < 1) ? 1 : quantity;
 
-        // Check if product already exists in user's cart
-        List<Cart> existingCart = cartRepository.findByProductIdAndUserId(productId, userId);
+        if (product.getStock() < qty) {
+            throw new RuntimeException("Not enough stock available");
+        }
 
-        Cart newCart = new Cart();
-        newCart.setUser(user);
-        newCart.setProduct(product);
-        newCart.setQuantity(qty);
-        newCart.setTotalPrice(qty * product.getDiscountPrice());
-        return cartRepository.save(newCart);
+        List<Cart> existingCartList = cartRepository.findByProductIdAndUserId(productId, userId);
+        Cart cart;
 
+        if (!existingCartList.isEmpty()) {
+            cart = existingCartList.get(0);
+            int newQuantity = cart.getQuantity() + qty;
+
+            if (product.getStock() < newQuantity - cart.getQuantity()) {
+                throw new RuntimeException("Not enough stock for update");
+            }
+
+            cart.setQuantity(newQuantity);
+            cart.setTotalPrice(newQuantity * product.getDiscountPrice());
+        } else {
+            cart = new Cart();
+            cart.setUser(user);
+            cart.setProduct(product);
+            cart.setQuantity(qty);
+            cart.setTotalPrice(qty * product.getDiscountPrice());
+        }
+
+        product.setStock(product.getStock() - qty);
+        productRepository.save(product);
+
+        return cartRepository.save(cart);
     }
+
 
 
     @Override
@@ -93,20 +112,45 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void updateCartQuantityById(String cartId, int quantity) {
+    public void updateCartQuantityById(String cartId, int newQuantity) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
-        if (quantity < 1) quantity = 1;
+        Product product = cart.getProduct();
+        int currentQuantity = cart.getQuantity();
 
-        cart.setQuantity(quantity);
-        cart.setTotalPrice(quantity * cart.getProduct().getDiscountPrice());
+        if (newQuantity < 1) newQuantity = 1;
 
+        int difference = newQuantity - currentQuantity;
+
+        if (difference > 0) {
+            if (product.getStock() < difference) {
+                throw new RuntimeException("Not enough stock available");
+            }
+            product.setStock(product.getStock() - difference);
+        } else if (difference < 0) {
+            product.setStock(product.getStock() + (-difference));
+        }
+
+        cart.setQuantity(newQuantity);
+        cart.setTotalPrice(newQuantity * product.getDiscountPrice());
+
+        productRepository.save(product);
         cartRepository.save(cart);
     }
 
+
     @Override
     public void deleteCartById(String cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        Product product = cart.getProduct();
+        int quantity = cart.getQuantity();
+
+        product.setStock(product.getStock() + quantity);
+        productRepository.save(product);
+
         cartRepository.deleteById(cartId);
     }
 

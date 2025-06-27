@@ -23,3 +23,7 @@ export function deleteCategory(id) {
 export function getViewCategories(){
     return api.get('/categories');
 }
+
+export function getProductByCategory(name) {
+  return api.get(`/categories/${name}`);
+}

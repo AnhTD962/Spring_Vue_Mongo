@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.controller.dto.request.ProductWithCategoryDTO;
 import com.example.backend.model.entity.Category;
 import org.springframework.data.domain.Page;
 
@@ -18,7 +19,5 @@ public interface CategoryService {
     public Category getCategoryById(String id);
 
     public List<Category> getAllActiveCategory();
-
-    public Page<Category> getAllCategorPagination(Integer pageNo, Integer pageSize);
 
 }
