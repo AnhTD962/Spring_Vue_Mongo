@@ -20,6 +20,4 @@ onMounted(async () => {
   const { data } = await getViewProducts();
   products.value = data.products;
 });
-
-console.log(products);
 </script>

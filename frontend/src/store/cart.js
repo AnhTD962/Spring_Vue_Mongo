@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { getCart, addToCart, updateCartItem, removeCartItem } from "../api/cart";
+import { getCart, addToCart, updateCartQuantity, removeCartItem } from "../api/cart";
 
 export const useCartStore = defineStore("cart", {
     state: () => ({
@@ -14,8 +14,8 @@ export const useCartStore = defineStore("cart", {
             await addToCart(payload);
             await this.fetchCart();
         },
-        async updateItem(id, payload) {
-            await updateCartItem(id, payload);
+        async updateCartQuantity(id, payload) {
+            await updateCartQuantity(id, payload);
             await this.fetchCart();
         },
         async removeItem(id) {

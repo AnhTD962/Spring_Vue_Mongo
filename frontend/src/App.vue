@@ -37,4 +37,5 @@ import CategoriesView from './views/CategoriesView.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
+
 </script>

@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ public class OrderServiceImpl implements OrderService {
     private CommonUtil commonUtil;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveOrder(String userId, OrderRequestDTO orderRequest) throws Exception {
         List<Cart> carts = cartRepository.findByUserId(userId);
         if (carts.isEmpty()) {
@@ -85,9 +87,10 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderAddress(address);
 
         Order savedOrder = orderRepository.save(order);
-        cartRepository.deleteAll(carts); // clear cart
+        cartRepository.deleteAll(carts);
         commonUtil.sendMailForProductOrder(savedOrder, "In Progress");
     }
+
 
     @Override
     public List<Order> getOrdersByUser(String userId) {

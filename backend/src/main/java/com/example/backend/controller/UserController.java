@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.controller.dto.request.CartRequestDTO;
+import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.controller.dto.request.OrderRequestDTO;
 import com.example.backend.controller.dto.response.CartListResponseDTO;
 import com.example.backend.model.entity.Cart;
@@ -158,13 +159,13 @@ public class UserController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestParam String newPassword, @RequestParam String currentPassword, Principal principal) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request, Principal principal) {
         User user = userService.getUserByEmail(principal.getName());
-        boolean matches = passwordEncoder.matches(currentPassword, user.getPassword());
+        boolean matches = passwordEncoder.matches(request.getCurrentPassword(), user.getPassword());
         if (!matches) {
             return ResponseEntity.badRequest().body("Current password is incorrect");
         }
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.updateUser(user);
         return ResponseEntity.ok("Password changed successfully");
     }

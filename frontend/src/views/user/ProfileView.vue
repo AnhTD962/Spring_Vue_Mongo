@@ -2,15 +2,20 @@
   <div v-if="profile">
     <h2>My Profile</h2>
     <form @submit.prevent="save">
-      <input type="file" @change="onFileChange" />
-      <input v-model="profile.name" placeholder="Name" required />
-      <input v-model="profile.email" type="email" placeholder="Email" disabled />
-      <input v-model="profile.mobileNumber" placeholder="Phone number" />
-      <input v-model="profile.address" placeholder="Address" />
-      <input v-model="profile.city" placeholder="City" />
-      <input v-model="profile.state" placeholder="State" />
-      <input v-model="profile.pincode" placeholder="Pin code" />
+      <div>Avata: <input type="file" @change="onFileChange" /></div>
+      <div>Full name: <input v-model="profile.name" placeholder="Name" required /></div>
+      <div>Email: <input v-model="profile.email" type="email" placeholder="Email" disabled /></div>
+      <div>Phone number: <input v-model="profile.mobileNumber" placeholder="Phone number" /></div>
+      <div>Address: <input v-model="profile.address" placeholder="Address" /></div>
+      <div>City: <input v-model="profile.city" placeholder="City" /></div>
+      <div>State: <input v-model="profile.state" placeholder="State" /></div>
+      <div>Pin code: <input v-model="profile.pincode" placeholder="Pin code" /></div>
       <button type="submit">Save</button>
+      <div>
+        <router-link to="/change-password">
+          <button type="button">Change Password</button>
+        </router-link>
+      </div>
       <div v-if="msg">{{ msg }}</div>
     </form>
   </div>

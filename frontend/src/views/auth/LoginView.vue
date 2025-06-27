@@ -36,7 +36,7 @@ async function handleLogin() {
     await auth.login({ email: email.value, password: password.value })
     // Redirect based on role
     if (auth.user && auth.user.role === 'ROLE_ADMIN') {
-      router.push('/admin')
+      router.push('/admin/orders')
     } else {
       router.push('/')
     }

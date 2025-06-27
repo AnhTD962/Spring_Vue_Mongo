@@ -2,17 +2,17 @@ import api from "./axios";
 
 // Admin actions
 export function getUsers() {
-    return api.get("/api/admin/users");
+    return api.get("/admin/users");
 }
 
 export function getUser(id) {
-    return api.get(`/api/admin/users/${id}`);
+    return api.get(`/admin/users/${id}`);
 }
 
 export function toggleUserStatus(id, status) {
-    return api.put(`/api/admin/users/${id}/status`, null, { params: { status } });
+    return api.put(`/admin/users/${id}/status`, null, { params: { status } });
 }
 
 export function addAdmin(payload) {
-    return api.post("/api/admin/admins", payload);
+    return api.post("/admin/admins", payload);
 }

@@ -1,9 +1,10 @@
 <template>
   <nav>
     <router-link to="/admin/products">Manage Products</router-link> |
-    <router-link to="/admin/categories">Categories</router-link> |
-    <router-link to="/admin/users">Users</router-link> |
-    <router-link to="/admin/orders">Orders</router-link> 
+    <router-link to="/admin/categories">Manage Categories</router-link> |
+    <router-link to="/admin/users">Manage Users</router-link> |
+    <router-link to="/admin/orders">Manage Orders</router-link> |
+    <router-link to="/admin/profile">Profile</router-link> 
     <button @click="logout" class="logout-btn">Logout</button>
   </nav>
 </template>
@@ -16,8 +17,9 @@ const auth = useAuthStore()
 const router = useRouter()
 
 function logout() {
+  const wasAdmin = auth.userRole === 'ROLE_ADMIN' 
   auth.logout()
-  router.push('/login')
+  router.push(wasAdmin ? '/home' : '/login') 
 }
 </script>
 
