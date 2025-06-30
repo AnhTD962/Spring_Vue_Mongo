@@ -16,19 +16,18 @@ const OrderDetailView = () => import("../views/user/OrderDetailView.vue")
 const ProductsByCategoryView = () => import('../views/ProductsByCategoryView.vue');
 
 const AdminProductListView = () => import("../views/admin/ProductListView.vue");
-const AdminProductDetailView = () => import("../views/admin/ProductDetailView.vue");
 const AdminProductCreateView = () => import("../views/admin/ProductCreateView.vue");
 const AdminProductEditView = () => import("../views/admin/ProductEditView.vue");
 const AdminCategoryListView = () => import("../views/admin/CategoryListView.vue");
 const AdminCategoryCreateView = () => import("../views/admin/CategoryCreateView.vue");
 const AdminCategoryEditView = () => import("../views/admin/CategoryEditView.vue");
 const AdminUserListView = () => import("../views/admin/UserListView.vue");
-const AdminUserDetailView = () => import("../views/admin/UserDetailView.vue");
 const AdminOrderListView = () => import("../views/admin/OrderListView.vue");
 const AdminOrderDetailView = () => import("../views/admin/OrderDetailView.vue");
 const AdminProfileView = () => import("../views/admin/AdminProfileView.vue");
 const AdminChangePasswordView = () => import("../views/admin/ChangeAdminPasswordView.vue")
 const CategoriesView = () => import("../views/CategoriesView.vue");
+const AddAdminView = () => import("../views/admin/AddAdminView.vue");
 
 const NotFoundView = () => import("../views/NotFoundView.vue");
 
@@ -51,21 +50,20 @@ const routes = [
     { path: "/categories", component: CategoriesView},
     { path: '/categories/:id', component: ProductsByCategoryView},
     
-
     // Admin
     { path: "/admin/products", component: AdminProductListView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/products/create", component: AdminProductCreateView, meta: { requiresAuth: true, requiresAdmin: true } },
-    { path: "/admin/products/:id", component: AdminProductDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/products/:id/edit", component: AdminProductEditView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/categories", component: AdminCategoryListView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/categories/create", component: AdminCategoryCreateView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/categories/:id/edit", component: AdminCategoryEditView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/users", component: AdminUserListView, meta: { requiresAuth: true, requiresAdmin: true } },
-    { path: "/admin/users/:id", component: AdminUserDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/orders", component: AdminOrderListView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin/orders/:id", component: AdminOrderDetailView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin-change-password", component: AdminChangePasswordView, meta: { requiresAuth: true, requiresAdmin: true } },
     { path: "/admin-profile", component: AdminProfileView, meta: { requiresAuth: true, requiresAdmin: true } },
+    { path: "/admin/add-new-admin", component: AddAdminView, meta: { requiresAuth: true, requiresAdmin: true }},
+
 
     // 404
     { path: "/:pathMatch(.*)*", component: NotFoundView }

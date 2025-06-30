@@ -1,4 +1,4 @@
-package com.example.backend.controller;
+package com.example.backend.controller.auth;
 
 import com.example.backend.controller.dto.request.SigninRequestDTO;
 import com.example.backend.model.entity.User;
@@ -27,12 +27,8 @@ public class AuthController {
     private UserService userService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
 
-    // Đăng ký
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
             @ModelAttribute User user,
@@ -65,7 +61,6 @@ public class AuthController {
             User user = userService.getUserByEmail(loginRequest.getEmail());
             session.setAttribute("user", user);
 
-            // ✅ Trả về thông tin user cho frontend
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Login successful",
@@ -78,7 +73,6 @@ public class AuthController {
         }
     }
 
-    // Đăng xuất
     @PostMapping("/signout")
     public String signout(HttpSession session) {
         session.invalidate();

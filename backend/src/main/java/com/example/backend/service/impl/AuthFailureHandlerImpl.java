@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -27,41 +26,37 @@ public class AuthFailureHandlerImpl extends SimpleUrlAuthenticationFailureHandle
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-
         String email = request.getParameter("username");
 
-        User User = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
 
-        if (User != null) {
+        String errorMessage = "Email or password is invalid";
 
-            if (User.getIsEnable()) {
-
-                if (User.getAccountNonLocked()) {
-
-                    if (User.getFailedAttempt() < AppConstant.ATTEMPT_TIME) {
-                        userService.increaseFailedAttempt(User);
-                    } else {
-                        userService.userAccountLock(User);
-                        exception = new LockedException("Your account is locked !! failed attempt 3");
-                    }
+        if (user != null) {
+            if (!user.getIsEnable()) {
+                errorMessage = "Your account is inactive";
+            } else if (!user.getAccountNonLocked()) {
+                if (userService.unlockAccountTimeExpired(user)) {
+                    errorMessage = "Your account is unlocked. Please try to login again.";
                 } else {
-
-                    if (userService.unlockAccountTimeExpired(User)) {
-                        exception = new LockedException("Your account is unlocked !! Please try to login");
-                    } else {
-                        exception = new LockedException("your account is Locked !! Please try after sometimes");
-                    }
+                    errorMessage = "Your account is locked. Please try again later.";
                 }
-
             } else {
-                exception = new LockedException("your account is inactive");
+                if (user.getFailedAttempt() < AppConstant.ATTEMPT_TIME - 1) {
+                    userService.increaseFailedAttempt(user);
+                    errorMessage = "Invalid credentials. Attempt: " + (user.getFailedAttempt() + 1);
+                } else {
+                    userService.userAccountLock(user);
+                    errorMessage = "Your account is locked due to 3 failed attempts.";
+                }
             }
-        } else {
-            exception = new LockedException("Email & password invalid");
         }
 
-        super.setDefaultFailureUrl("/signin?error");
-        super.onAuthenticationFailure(request, response, exception);
+        // Set response as JSON
+        response.setContentType("application/json");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write("{\"error\": \"" + errorMessage + "\"}");
     }
+
 
 }

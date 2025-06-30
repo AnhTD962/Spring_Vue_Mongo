@@ -18,6 +18,22 @@ public enum OrderStatus {
         this.name = name;
     }
 
+    public static OrderStatus fromString(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status cannot be null or empty");
+        }
+
+        String input = status.trim().toLowerCase();
+
+        for (OrderStatus os : OrderStatus.values()) {
+            if (os.getName().toLowerCase().equals(input)) {
+                return os;
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid order status: " + status);
+    }
+
     public int getId() {
         return id;
     }

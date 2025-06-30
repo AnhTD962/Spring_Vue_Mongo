@@ -18,11 +18,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -102,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
     public Order updateOrderStatus(String id, String status) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
-        order.setStatus(OrderStatus.valueOf(status));
+        order.setStatus(OrderStatus.fromString(status));
         return orderRepository.save(order);
     }
 

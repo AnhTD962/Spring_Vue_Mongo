@@ -4,7 +4,7 @@
     <router-link to="/admin/categories/create">Create Category</router-link>
     <ul>
       <li v-for="c in categories" :key="c.id">
-        {{ c.name }}
+        {{ c.name }} - {{ c.isActive }}
         <router-link :to="`/admin/categories/${c.id}/edit`">Edit</router-link>
         <button @click="remove(c.id)">Delete</button>
       </li>

@@ -1,8 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.controller.dto.request.ProductWithCategoryDTO;
 import com.example.backend.model.entity.Category;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -122,8 +121,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        return userRepository.save(user);
+    public void updateUser(User user) {
+        userRepository.save(user);
     }
 
     @Override
@@ -177,6 +176,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveAdmin(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
         user.setRole("ROLE_ADMIN");
         user.setIsEnable(true);
         user.setAccountNonLocked(true);
@@ -191,6 +193,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean existsEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public User getUserById(String id) {
+        return userRepository.findById(id).orElse(null);
     }
 
 }

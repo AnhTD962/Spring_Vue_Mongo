@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -31,14 +30,14 @@ public class Product {
     private Double price;
 
     @Field("stock")
-    private int stock;
+    private Integer stock;
 
     @Transient
     @Field("image")
     private String image;
 
     @Field("discount")
-    private int discount;
+    private Double discount;
 
     @Field("discount_price")
     private Double discountPrice;

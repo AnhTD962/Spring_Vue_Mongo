@@ -29,12 +29,14 @@ public interface UserService {
 
     public User getUserByToken(String token);
 
-    public User updateUser(User user);
+    public void updateUser(User user);
 
     public User updateUserProfile(User dbUser, User user, MultipartFile img);
 
     public User saveAdmin(User user);
 
     public Boolean existsEmail(String email);
+
+    public User getUserById(String id);
 
 }

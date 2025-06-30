@@ -1,15 +1,19 @@
 import api from "./axios";
 
-export function getOrders(params) {
-    return api.get("/admin/orders", { params });
+export function getOrders(params = { pageNo: 0, pageSize: 10 }) {
+  return api.get("/admin/orders", { params });
 }
 
-export function getOrder(id) {
-    return api.get(`/admin/orders/${id}`);
+export function getOrder(orderId) {
+    return api.get(`/admin/orders/${orderId}`);
 }
 
-export function updateOrderStatus(id, status) {
-    return api.put(`/admin/orders/${id}/status`, null, { params: { st: status } });
+export function updateOrderStatus(orderId, status) {
+    return api.put(`/admin/orders/${orderId}/status`, null, { params: { st: status } });
+}
+
+export function searchOrder(orderId) {
+  return api.get("/admin/orders/search", { params: { orderId } });
 }
 
 // For users to see their own orders

@@ -8,6 +8,10 @@ export function getCategory(id) {
     return api.get(`/admin/categories/${id}`);
 }
 
+export function getCategoryActive(){
+    return api.get(`/admin/categories/active`);
+}
+
 export function createCategory(payload) {
     return api.post("/admin/categories", payload);
 }

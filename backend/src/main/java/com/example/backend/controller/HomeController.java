@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import com.example.backend.controller.dto.request.ProductWithCategoryDTO;
 import com.example.backend.model.entity.Category;
 import com.example.backend.model.entity.Product;
 import com.example.backend.model.entity.User;
@@ -9,14 +8,10 @@ import com.example.backend.service.CategoryService;
 import com.example.backend.service.ProductService;
 import com.example.backend.service.UserService;
 import com.example.backend.util.CommonUtil;
-import io.micrometer.common.util.StringUtils;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

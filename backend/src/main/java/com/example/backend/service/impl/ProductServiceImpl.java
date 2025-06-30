@@ -1,24 +1,18 @@
 package com.example.backend.service.impl;
 
-import com.example.backend.controller.dto.request.ProductWithCategoryDTO;
-import com.example.backend.model.entity.Category;
 import com.example.backend.model.entity.Product;
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ProductRepository;
-import com.example.backend.service.CategoryService;
 import com.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -53,8 +47,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductById(String id) {
-        Product product = productRepository.findById(id).orElse(null);
-        return product;
+        return productRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -66,8 +59,13 @@ public class ProductServiceImpl implements ProductService {
     public Product updateProduct(Product product, MultipartFile image) {
 
         Product dbProduct = getProductById(product.getId());
+        if (dbProduct == null) {
+            throw new RuntimeException("Product not found with ID: " + product.getId());
+        }
 
-        String imageName = image.isEmpty() ? dbProduct.getImage() : image.getOriginalFilename();
+        String imageName = (image != null && !image.isEmpty())
+                ? image.getOriginalFilename()
+                : dbProduct.getImage();
 
         dbProduct.setTitle(product.getTitle());
         dbProduct.setDescription(product.getDescription());
@@ -76,34 +74,35 @@ public class ProductServiceImpl implements ProductService {
         dbProduct.setStock(product.getStock());
         dbProduct.setImage(imageName);
         dbProduct.setIsActive(product.getIsActive());
-        dbProduct.setDiscount(product.getDiscount());
 
-        // 5=100*(5/100); 100-5=95
-        Double disocunt = product.getPrice() * (product.getDiscount() / 100.0);
-        Double discountPrice = product.getPrice() - disocunt;
-        dbProduct.setDiscountPrice(discountPrice);
+        double discount = product.getDiscount() != null ? product.getDiscount() : 0.0;
+        dbProduct.setDiscount(discount);
 
-        Product updateProduct = productRepository.save(dbProduct);
-
-        if (!ObjectUtils.isEmpty(updateProduct)) {
-
-            if (!image.isEmpty()) {
-
-                try {
-                    File saveFile = new ClassPathResource("static/img").getFile();
-
-                    Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + "product_img" + File.separator
-                            + image.getOriginalFilename());
-                    Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return product;
+        if (product.getPrice() != null) {
+            double discountAmount = product.getPrice() * (discount / 100.0);
+            dbProduct.setDiscountPrice(product.getPrice() - discountAmount);
         }
-        return null;
+
+        Product updatedProduct = productRepository.save(dbProduct);
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                Path uploadDir = Paths.get("uploads/product_img/");
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+
+                assert imageName != null;
+                Path path = uploadDir.resolve(imageName);
+                Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return updatedProduct;
     }
+
 
     @Override
     public List<Product> searchProduct(String ch) {
