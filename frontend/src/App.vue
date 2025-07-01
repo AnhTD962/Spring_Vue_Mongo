@@ -1,28 +1,33 @@
 <template>
   <div id="app">
-    <template v-if="route.path === '/login'">
+    <template v-if="['/login', '/register', '/forgot-password'].includes(route.path)">
       <router-view />
     </template>
     <template v-else>
-      <div>
-        <div v-if="!auth.isAuthenticated">
-          <router-link to="/home">| Home </router-link>
-          <router-link to="/products">| Products </router-link>
-          <router-link to="/categories">| Categories </router-link>
-          <router-link to="/cart">| Cart </router-link>
-          <router-link to="/login">| Login </router-link>
+      <header class="navbar">
+        <div v-if="!auth.isAuthenticated" class="navbar-layout">
+          <div class="nav-center">
+            <router-link to="/home">Home</router-link>
+            <router-link to="/products">Products</router-link>
+            <router-link to="/categories">Categories</router-link>
+            <router-link to="/cart">Cart</router-link>
+          </div>
+          <div class="nav-right">
+            <router-link to="/login">Login</router-link>
+          </div>
         </div>
-        <AdminNavbar v-if="auth.userRole === 'ROLE_ADMIN'" />
-        <UserNavbar v-else-if="auth.userRole === 'ROLE_USER'" />
-        <span v-if="auth.isAuthenticated">
-          | Welcome: <b>{{ auth.user?.email }}</b>
-        </span>
-        <!-- Only show these when on home -->
-        <ProductListView v-if="route.path === '/home'" />
+
+        <div v-if="auth.isAuthenticated">
+          <AdminNavbar v-if="auth.userRole === 'ROLE_ADMIN'" />
+          <UserNavbar v-else-if="auth.userRole === 'ROLE_USER'" />
+        </div>
+      </header>
+
+      <main class="main-content">
         <CategoriesView v-if="route.path === '/home'" />
-        <!-- Show routed component for other pages -->
+        <ProductListView v-if="route.path === '/home'" />
         <router-view v-if="route.path !== '/home'" />
-      </div>
+      </main>
     </template>
   </div>
 </template>
@@ -37,5 +42,51 @@ import CategoriesView from './views/CategoriesView.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
-
 </script>
+
+<style scoped>
+#app {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.navbar {
+  background-color: #f7f7f7;
+  padding: 15px 25px;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.nav-center {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-right {
+  position: absolute;
+  right: 0;
+}
+
+.nav-center a,
+.nav-right a {
+  text-decoration: none;
+  color: #007BFF;
+  font-weight: 500;
+}
+
+.nav-center a:hover,
+.nav-right a:hover {
+  text-decoration: underline;
+}
+
+
+.main-content {
+  padding: 30px 20px;
+}
+</style>

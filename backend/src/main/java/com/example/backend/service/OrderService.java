@@ -6,21 +6,21 @@ import com.example.backend.model.entity.Order;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface OrderService {
+    void saveOrder(String userId, OrderRequestDTO orderRequest) throws Exception;
 
-    public void saveOrder(String userid, OrderRequestDTO orderRequest) throws Exception;
+    List<Order> getOrdersByUser(String userId);
 
-    public List<Order> getOrdersByUser(String userId);
+    Order updateOrderStatus(String id, Integer statusId);
 
-    public Order updateOrderStatus(String id, String status);
+    List<Order> getAllOrders();
 
-    public List<Order> getAllOrders();
+    Order getOrdersByOrderId(String orderId);
 
-    public Order getOrdersByOrderId(String orderId);
+    Page<Order> getAllOrdersPagination(Integer pageNo, Integer pageSize);
 
-    public Page<Order> getAllOrdersPagination(Integer pageNo, Integer pageSize);
+    OrderDetailResponseDTO getOrderDetail(String id);
 
-    public OrderDetailResponseDTO getOrderDetail(String id);
+    Order searchOrderByOrderId(String orderId);
 }

@@ -1,36 +1,49 @@
 <template>
-  <div>
+  <div class="admin-orders-wrapper">
     <h2>Admin - Orders</h2>
-    <ul v-if="orders.length">
-      <li v-for="o in orders" :key="o.id" class="mb-4 border-b pb-2">
-        <div>
-          <strong>Order #{{ o.orderId }}</strong> - {{ o.total.toFixed(2) }} USD
-        </div>
 
-        <div class="mt-1">
-          <label>Status:</label>
-          <select v-model="tempStatus[o.id]" @change="changeStatus(o)">
-            <option
-              v-for="(enumName, id) in filteredStatusOptions(o.status)"
-              :key="id"
-              :value="enumName"
+    <table v-if="orders.length" class="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Total (USD)</th>
+          <th>Status</th>
+          <th>Update</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="o in orders" :key="o.id">
+          <td>#{{ o.orderId }}</td>
+          <td>${{ o.total.toFixed(2) }}</td>
+          <td>{{ statusLabels[o.status] }}</td>
+          <td>
+            <select v-model="tempStatus[o.id]" @change="changeStatus(o)">
+              <option
+                v-for="(enumName, id) in filteredStatusOptions(o.status)"
+                :key="id"
+                :value="enumName"
+              >
+                {{ statusLabels[enumName] }}
+              </option>
+            </select>
+          </td>
+          <td>
+            <router-link
+              :to="`/admin/orders/${o.orderId}`"
+              class="detail-link"
             >
-              {{ statusLabels[enumName] }}
-            </option>
-          </select>
+              View
+            </router-link>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-          <router-link
-            :to="`/admin/orders/${o.orderId}`"
-            class="ml-4 text-blue-600 underline"
-          >
-            Detail
-          </router-link>
-        </div>
-      </li>
-    </ul>
-    <div v-else>No orders found.</div>
+    <div v-else class="no-orders">No orders found.</div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from "vue";
@@ -109,3 +122,58 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.admin-orders-wrapper {
+  padding: 40px 20px;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.orders-table {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 0.75rem;
+  border: 1px solid #eee;
+  text-align: center;
+}
+
+.orders-table th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+select {
+  padding: 0.4rem;
+  font-size: 0.95rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.detail-link {
+  color: #7b2ff2;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.no-orders {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #777;
+  margin-top: 2rem;
+}
+</style>

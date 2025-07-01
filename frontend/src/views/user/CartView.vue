@@ -133,13 +133,62 @@ async function checkout() {
 </script>
 
 <style scoped>
+ul {
+  padding-left: 0;
+  list-style: none;
+  max-width: 700px;
+  margin: auto;
+}
+
+li {
+  background: #fff;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+input[type="number"] {
+  padding: 4px;
+  font-size: 1rem;
+  width: 60px;
+  margin-left: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background: #7b2ff2;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #6920d4;
+}
+
+h2, h3, h4 {
+  text-align: center;
+  margin-top: 2rem;
+  color: #333;
+}
+
+hr {
+  margin: 2rem auto;
+  max-width: 700px;
+}
+
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -147,10 +196,37 @@ async function checkout() {
 
 .modal-content {
   background-color: #fff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  width: 400px;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-content button {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.modal-content ul {
+  padding-left: 1rem;
+  list-style: disc;
+  margin-bottom: 1rem;
+}
+
+.modal-content h4 {
+  margin-top: 1rem;
+  color: #222;
+  font-size: 1.1rem;
 }
 </style>

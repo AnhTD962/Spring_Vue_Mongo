@@ -32,5 +32,5 @@ export function getViewProducts(){
 }
 
 export function getViewProductDetail(id, payload){
-    return api.get(`/product/${id}`, payload);
+    return api.get(`/products/${id}`, payload);
 }

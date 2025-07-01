@@ -11,6 +11,7 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class CartServiceImpl implements CartService {
     private ProductRepository productRepository;
 
     @Override
+    @Transactional
     public Cart saveCart(String productId, String userId, Integer quantity) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -112,6 +114,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void updateCartQuantityById(String cartId, int newQuantity) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
@@ -141,6 +144,7 @@ public class CartServiceImpl implements CartService {
 
 
     @Override
+    @Transactional
     public void deleteCartById(String cartId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));

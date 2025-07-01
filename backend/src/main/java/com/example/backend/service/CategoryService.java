@@ -1,21 +1,23 @@
 package com.example.backend.service;
 
 import com.example.backend.model.entity.Category;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface CategoryService {
+    Category saveCategory(Category category, MultipartFile file) throws IOException;
 
-    public Category saveCategory(Category category);
+    List<Category> getAllCategory();
 
-    public Boolean existCategory(String name);
+    Boolean existCategory(String name);
 
-    public List<Category> getAllCategory();
+    Boolean deleteCategory(String id);
 
-    public Boolean deleteCategory(String id);
+    Category getCategoryById(String id);
 
-    public Category getCategoryById(String id);
+    List<Category> getAllActiveCategory();
 
-    public List<Category> getAllActiveCategory();
-
+    Category updateCategory(String id, Category category, MultipartFile file) throws IOException;
 }

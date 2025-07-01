@@ -4,7 +4,7 @@
     <form @submit.prevent="submit">
       <input v-model="product.title" placeholder="Name" required />
       <input v-model="product.description" placeholder="Description" required />
-      
+
       <select v-model="product.category" required>
         <option disabled value="">Select category</option>
         <option v-for="cat in categories" :key="cat.id" :value="cat.name">
@@ -76,3 +76,50 @@ async function submit() {
   router.push("/admin/products");
 }
 </script>
+<style scoped>
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+form {
+  max-width: 500px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+input,
+select {
+  padding: 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+input[readonly] {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+}
+
+button {
+  padding: 0.6rem 1.2rem;
+  background-color: #7b2ff2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #6920d4;
+}
+</style>

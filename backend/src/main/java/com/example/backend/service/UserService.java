@@ -1,42 +1,53 @@
 package com.example.backend.service;
 
+import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
+import com.example.backend.controller.dto.request.SigninRequestDTO;
 import com.example.backend.model.entity.User;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
-    public User saveUser(User user);
+    User saveUser(User user);
 
-    public User getUserByEmail(String email);
+    User getUserByEmail(String email);
 
-    public List<User> getUsers(String role);
+    List<User> getUsers(String role);
 
-    public List<User> getAllUsers();
+    List<User> getAllUsers();
 
-    public Boolean updateAccountStatus(String id, Boolean status);
+    Boolean updateAccountStatus(String id, Boolean status);
 
-    public void increaseFailedAttempt(User user);
+    void increaseFailedAttempt(User user);
 
-    public void userAccountLock(User user);
+    void userAccountLock(User user);
 
-    public boolean unlockAccountTimeExpired(User user);
+    boolean unlockAccountTimeExpired(User user);
 
-    public void resetAttempt(int userId);
+    void updateUserResetToken(String email, String resetToken);
 
-    public void updateUserResetToken(String email, String resetToken);
+    void updateUser(User user);
 
-    public User getUserByToken(String token);
+    User updateUserProfile(Principal principal, User update, MultipartFile img);
 
-    public void updateUser(User user);
+    User saveAdmin(User user);
 
-    public User updateUserProfile(User dbUser, User user, MultipartFile img);
+    User getUserById(String id);
 
-    public User saveAdmin(User user);
+    void uploadUserImage(MultipartFile file, String folder) throws Exception;
 
-    public Boolean existsEmail(String email);
+    User getProfile(Principal principal);
 
-    public User getUserById(String id);
 
+    String changePassword(Principal principal, ChangePasswordRequestDTO request);
+
+    String registerUser(User user, MultipartFile avatar);
+
+    Map<String, Object> login(SigninRequestDTO loginRequest, HttpSession session);
+
+    String forgotPasswordAndSendNewPassword(String email);
 }

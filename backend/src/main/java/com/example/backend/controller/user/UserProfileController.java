@@ -3,7 +3,6 @@ package com.example.backend.controller.user;
 import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.model.entity.User;
 import com.example.backend.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,48 +25,24 @@ public class UserProfileController {
     private PasswordEncoder passwordEncoder;
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(Principal principal, HttpServletRequest request) {
-        if (principal == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
-        }
-        User user = userService.getUserByEmail(principal.getName());
-        if (user == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
-        }
+    public ResponseEntity<User> getUserProfile(Principal principal) {
+        User user = userService.getProfile(principal);
         return ResponseEntity.ok(user);
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(
+    public ResponseEntity<User> updateProfile(
             @ModelAttribute User user,
             @RequestParam(value = "img", required = false) MultipartFile img,
             Principal principal
     ) {
-        User dbUser = userService.getUserByEmail(principal.getName());
-        if (dbUser == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
-        }
-
-        // Không update email vì email là cố định để định danh user
-        user.setEmail(dbUser.getEmail());
-
-        User updated = userService.updateUserProfile(dbUser, user, img);
-        if (updated == null) {
-            return ResponseEntity.badRequest().body("Update failed");
-        }
-
+        User updated = userService.updateUserProfile(principal, user, img);
         return ResponseEntity.ok(updated);
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request, Principal principal) {
-        User user = userService.getUserByEmail(principal.getName());
-        boolean matches = passwordEncoder.matches(request.getCurrentPassword(), user.getPassword());
-        if (!matches) {
-            return ResponseEntity.badRequest().body("Current password is incorrect");
-        }
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userService.updateUser(user);
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequestDTO request, Principal principal) {
+        userService.changePassword(principal, request);
         return ResponseEntity.ok("Password changed successfully");
     }
 }

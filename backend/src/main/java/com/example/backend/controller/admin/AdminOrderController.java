@@ -1,7 +1,6 @@
 package com.example.backend.controller.admin;
 
 import com.example.backend.model.entity.Order;
-import com.example.backend.model.enums.OrderStatus;
 import com.example.backend.service.OrderService;
 import com.example.backend.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,45 +38,25 @@ public class AdminOrderController {
 
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<String> updateOrderStatus(@PathVariable String orderId, @RequestParam Integer st) {
-        OrderStatus[] values = OrderStatus.values();
-        String status = null;
-        for (OrderStatus orderSt : values) {
-            if (orderSt.getId() == st) {
-                status = orderSt.getName();
-                break;
-            }
-        }
-
-        if (status == null) {
-            return ResponseEntity.badRequest().body("Invalid status value");
-        }
-
-        Order updateOrder = orderService.updateOrderStatus(orderId, status);
-
         try {
-            commonUtil.sendMailForProductOrder(updateOrder, status);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (!ObjectUtils.isEmpty(updateOrder)) {
+            orderService.updateOrderStatus(orderId, st);
             return ResponseEntity.ok("Status Updated");
-        } else {
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Status not updated");
         }
     }
 
     @GetMapping("/orders/search")
-    public ResponseEntity<?> searchOrder(@RequestParam String orderId) {
-        if (orderId == null || orderId.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Order ID is required");
-        }
-
-        Order order = orderService.getOrdersByOrderId(orderId.trim());
-        if (ObjectUtils.isEmpty(order)) {
-            return ResponseEntity.notFound().build();
-        } else {
+    public ResponseEntity<Order> searchOrder(@RequestParam String orderId) {
+        try {
+            Order order = orderService.searchOrderByOrderId(orderId);
             return ResponseEntity.ok(order);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

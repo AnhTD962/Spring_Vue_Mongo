@@ -2,8 +2,6 @@ package com.example.backend.util;
 
 import com.example.backend.model.entity.Order;
 import com.example.backend.model.entity.OrderItem;
-import com.example.backend.model.entity.User;
-import com.example.backend.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +11,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 
 @Component
 public class CommonUtil {
@@ -21,15 +18,28 @@ public class CommonUtil {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Autowired
-    private UserService userService;
+    public void sendWelcomeEmail(String recipientEmail, String name) throws Exception {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setFrom("anhtdhe161165@fpt.edu.vn", "Spring Vue");
+        helper.setTo(recipientEmail);
+        helper.setSubject("Welcome to Spring Vue Shop");
+
+        String content = "<p>Hello <b>" + name + "</b>,</p>"
+                + "<p>Welcome to our Spring Boot + Vue e-commerce platform!</p>"
+                + "<p>Thank you for registering.</p>";
+
+        helper.setText(content, true);
+        mailSender.send(message);
+    }
 
     public Boolean sendMail(String url, String reciepentEmail) throws UnsupportedEncodingException, MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
-        helper.setFrom("daspabitra55@gmail.com", "Shooping Cart");
+        helper.setFrom("anhtdhe161165@fpt.edu.vn", "Spring Vue");
         helper.setTo(reciepentEmail);
 
         String content = "<p>Hello,</p>" + "<p>You have requested to reset your password.</p>"
@@ -43,7 +53,6 @@ public class CommonUtil {
 
     public static String generateUrl(HttpServletRequest request) {
 
-        // http://localhost:8080/forgot-password
         String siteUrl = request.getRequestURL().toString();
 
         return siteUrl.replace(request.getServletPath(), "");
@@ -84,7 +93,7 @@ public class CommonUtil {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        helper.setFrom("daspabitra55@gmail.com", "Shopping Cart");
+        helper.setFrom("anhtdhe161165@fpt.edu.vn", "Spring Vue");
         helper.setTo(order.getUser().getEmail());
         helper.setSubject("Order Confirmation - Status: " + status);
         helper.setText(msg.toString(), true);
@@ -93,12 +102,20 @@ public class CommonUtil {
         return true;
     }
 
+    public void sendNewPasswordEmail(String email, String newPassword) throws Exception {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-    public User getLoggedInUserDetails(Principal p) {
-        String email = p.getName();
-        User User = userService.getUserByEmail(email);
-        return User;
+        helper.setFrom("anhtdhe161165@fpt.edu.vn", "Spring Vue");
+        helper.setTo(email);
+        helper.setSubject("Your New Password");
+
+        String content = "<p>Hello,</p>"
+                + "<p>Your new password is: <b>" + newPassword + "</b></p>"
+                + "<p>Please login and change your password as soon as possible.</p>";
+
+        helper.setText(content, true);
+        mailSender.send(message);
     }
-
 
 }

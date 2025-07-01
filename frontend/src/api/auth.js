@@ -9,7 +9,7 @@ export function register(payload) {
 }
 
 export function forgotPassword(email) {
-    return api.post("/auth/forgot-password", { email });
+    return api.post("/forgot-password", { email });
 }
 
 export function logout() {

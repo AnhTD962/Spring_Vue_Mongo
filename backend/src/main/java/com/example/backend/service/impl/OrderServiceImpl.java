@@ -96,13 +96,6 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByUserId(userId);
     }
 
-    @Override
-    public Order updateOrderStatus(String id, String status) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-        order.setStatus(OrderStatus.fromString(status));
-        return orderRepository.save(order);
-    }
 
     @Override
     public List<Order> getAllOrders() {
@@ -166,5 +159,44 @@ public class OrderServiceImpl implements OrderService {
 
         dto.setItems(itemDTOs);
         return dto;
+    }
+
+    @Override
+    public Order updateOrderStatus(String id, Integer statusId) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        OrderStatus matchedStatus = null;
+        for (OrderStatus os : OrderStatus.values()) {
+            if (os.getId() == statusId) {
+                matchedStatus = os;
+                break;
+            }
+        }
+
+        if (matchedStatus == null) {
+            throw new IllegalArgumentException("Invalid status value");
+        }
+
+        order.setStatus(matchedStatus);
+        Order updatedOrder = orderRepository.save(order);
+
+        try {
+            commonUtil.sendMailForProductOrder(updatedOrder, matchedStatus.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return updatedOrder;
+    }
+
+    @Override
+    public Order searchOrderByOrderId(String orderId) {
+        if (orderId == null || orderId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Order ID is required");
+        }
+
+        return orderRepository.findByOrderId(orderId.trim())
+                .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 }
