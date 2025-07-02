@@ -4,6 +4,7 @@ import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.controller.dto.request.SigninRequestDTO;
 import com.example.backend.model.entity.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.security.JwtUtils;
 import com.example.backend.service.UserService;
 import com.example.backend.util.AppConstant;
 import com.example.backend.util.CommonUtil;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,8 +39,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     AuthenticationManager authenticationManager;
+
     @Autowired
     private CommonUtil commonUtil;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @Override
     public User saveUser(User user) {
@@ -90,7 +94,6 @@ public class UserServiceImpl implements UserService {
         return "User registered successfully. Confirmation email sent.";
     }
 
-
     @Override
     public Map<String, Object> login(SigninRequestDTO loginRequest, HttpSession session) {
         try {
@@ -100,17 +103,16 @@ public class UserServiceImpl implements UserService {
                             loginRequest.getPassword()
                     )
             );
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-            securityContext.setAuthentication(authentication);
-            session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = getUserByEmail(loginRequest.getEmail());
-            session.setAttribute("user", user);
+            String jwt = jwtUtils.generateJwtToken(user.getEmail());
 
             return Map.of(
                     "success", true,
                     "message", "Login successful",
-                    "user", user
+                    "user", user,
+                    "token", jwt
             );
         } catch (Exception e) {
             return Map.of(
