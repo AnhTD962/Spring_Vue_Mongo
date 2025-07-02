@@ -1,7 +1,7 @@
 <template>
   <div class="orders-wrapper">
     <h2>My Orders</h2>
-    <div v-if="orders.length" class="orders-table-container">
+    <div v-if="paginatedOrders.length" class="orders-table-container">
       <table class="orders-table">
         <thead>
           <tr>
@@ -12,8 +12,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(o, index) in orders" :key="o.id">
-            <td>{{ index + 1 }}</td>
+          <tr v-for="(o, index) in paginatedOrders" :key="o.id">
+            <td>{{ index + 1 + currentPage * pageSize }}</td>
             <td>{{ o.orderId }}</td>
             <td>{{ o.status }}</td>
             <td>
@@ -24,17 +24,41 @@
       </table>
     </div>
     <div v-else class="no-orders">You haven't placed any orders yet.</div>
+
+    <div class="pagination" v-if="totalPages > 1">
+      <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
+      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">Next</button>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { getMyOrders } from "../../api/orders";
 
-const orders = ref([]);
+const allOrders = ref([]);
+const pageSize = 5;
+const currentPage = ref(0);
+
+const totalPages = computed(() => Math.ceil(allOrders.value.length / pageSize));
+
+const paginatedOrders = computed(() => {
+  const start = currentPage.value * pageSize;
+  return allOrders.value.slice(start, start + pageSize);
+});
+
+function nextPage() {
+  if (currentPage.value + 1 < totalPages.value) currentPage.value++;
+}
+
+function prevPage() {
+  if (currentPage.value > 0) currentPage.value--;
+}
+
 onMounted(async () => {
   const { data } = await getMyOrders();
-  orders.value = data;
+  allOrders.value = data || [];
 });
 </script>
 
@@ -95,5 +119,25 @@ h2 {
   text-align: center;
   color: #777;
   font-size: 1.1rem;
+}
+
+.pagination {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.pagination button {
+  margin: 0 0.5rem;
+  padding: 6px 12px;
+  background: #7b2ff2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>

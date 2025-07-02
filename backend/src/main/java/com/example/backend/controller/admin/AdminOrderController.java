@@ -2,12 +2,14 @@ package com.example.backend.controller.admin;
 
 import com.example.backend.model.entity.Order;
 import com.example.backend.service.OrderService;
-import com.example.backend.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -17,14 +19,20 @@ public class AdminOrderController {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private CommonUtil commonUtil;
-
     @GetMapping("/orders")
-    public ResponseEntity<Page<Order>> getAllOrders(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
-                                                    @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+    public ResponseEntity<Map<String, Object>> getAllOrders(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
         Page<Order> page = orderService.getAllOrdersPagination(pageNo, pageSize);
-        return ResponseEntity.ok(page);
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", page.getContent());
+        response.put("totalPages", page.getTotalPages()); // ✅ Add flat field
+        response.put("totalElements", page.getTotalElements());
+        response.put("number", page.getNumber());
+        response.put("size", page.getSize());
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/orders/{orderId}")

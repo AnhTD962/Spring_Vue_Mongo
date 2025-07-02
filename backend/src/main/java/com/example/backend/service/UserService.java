@@ -28,10 +28,6 @@ public interface UserService {
 
     boolean unlockAccountTimeExpired(User user);
 
-    void updateUserResetToken(String email, String resetToken);
-
-    void updateUser(User user);
-
     User updateUserProfile(Principal principal, User update, MultipartFile img);
 
     User saveAdmin(User user);
@@ -41,7 +37,6 @@ public interface UserService {
     void uploadUserImage(MultipartFile file, String folder) throws Exception;
 
     User getProfile(Principal principal);
-
 
     String changePassword(Principal principal, ChangePasswordRequestDTO request);
 

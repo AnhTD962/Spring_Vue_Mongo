@@ -2,7 +2,7 @@
   <div class="admin-orders-wrapper">
     <h2>Admin - Orders</h2>
 
-    <table v-if="orders.length" class="orders-table">
+    <table v-if="paginatedOrders.length" class="orders-table">
       <thead>
         <tr>
           <th>Order ID</th>
@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="o in orders" :key="o.id">
+        <tr v-for="o in paginatedOrders" :key="o.id">
           <td>#{{ o.orderId }}</td>
           <td>${{ o.total.toFixed(2) }}</td>
           <td>{{ statusLabels[o.status] }}</td>
@@ -41,15 +41,22 @@
     </table>
 
     <div v-else class="no-orders">No orders found.</div>
+
+    <!-- Pagination buttons -->
+    <div class="pagination" v-if="totalPages > 1">
+      <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
+      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">
+        Next
+      </button>
+    </div>
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { getOrders, updateOrderStatus } from "../../api/orders";
 
-// Mapping of status IDs to enum names (from backend)
 const statusOptions = {
   1: "IN_PROGRESS",
   2: "ORDER_RECEIVED",
@@ -60,7 +67,6 @@ const statusOptions = {
   7: "SUCCESS"
 };
 
-// Human-readable labels for display
 const statusLabels = {
   IN_PROGRESS: "In Progress",
   ORDER_RECEIVED: "Order Received",
@@ -71,15 +77,12 @@ const statusLabels = {
   SUCCESS: "Success"
 };
 
-// Reverse map enum -> ID
 function getStatusIdByName(enumName) {
   return (
-    Object.entries(statusOptions).find(([, name]) => name === enumName)?.[0] ??
-    null
+    Object.entries(statusOptions).find(([, name]) => name === enumName)?.[0] ?? null
   );
 }
 
-// Allow current status and forward transitions only
 function filteredStatusOptions(currentEnum) {
   const currentId = parseInt(getStatusIdByName(currentEnum));
   return Object.fromEntries(
@@ -87,10 +90,30 @@ function filteredStatusOptions(currentEnum) {
   );
 }
 
-const orders = ref([]);
+const allOrders = ref([]);
 const tempStatus = ref({});
 
-// When dropdown is changed
+// Pagination setup
+const currentPage = ref(0);
+const pageSize = ref(5);
+
+const totalPages = computed(() =>
+  Math.ceil(allOrders.value.length / pageSize.value)
+);
+
+const paginatedOrders = computed(() => {
+  const start = currentPage.value * pageSize.value;
+  return allOrders.value.slice(start, start + pageSize.value);
+});
+
+function nextPage() {
+  if (currentPage.value + 1 < totalPages.value) currentPage.value++;
+}
+
+function prevPage() {
+  if (currentPage.value > 0) currentPage.value--;
+}
+
 async function changeStatus(order) {
   const newStatus = tempStatus.value[order.id];
   if (!newStatus || newStatus === order.status) return;
@@ -98,8 +121,6 @@ async function changeStatus(order) {
   try {
     const statusId = getStatusIdByName(newStatus);
     await updateOrderStatus(order.id, statusId);
-
-    // Reflect new value in UI after successful update
     order.status = newStatus;
     console.log(`✅ Order ${order.orderId} status updated to ${newStatus}`);
   } catch (e) {
@@ -108,11 +129,10 @@ async function changeStatus(order) {
   }
 }
 
-// Initial load
 onMounted(async () => {
   try {
     const { data } = await getOrders();
-    orders.value = data.content;
+    allOrders.value = data.content || [];
 
     data.content.forEach((o) => {
       tempStatus.value[o.id] = o.status;
@@ -122,6 +142,7 @@ onMounted(async () => {
   }
 });
 </script>
+
 
 <style scoped>
 .admin-orders-wrapper {
@@ -176,4 +197,24 @@ select {
   color: #777;
   margin-top: 2rem;
 }
+.pagination {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.pagination button {
+  margin: 0 0.5rem;
+  padding: 6px 12px;
+  background: #7b2ff2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 </style>

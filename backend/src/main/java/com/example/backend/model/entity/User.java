@@ -52,7 +52,4 @@ public class User {
     @Field("lock_time")
     private Date lockTime;
 
-    @Field("reset_token")
-    private String resetToken;
-
 }
