@@ -2,6 +2,20 @@
   <div class="admin-orders-wrapper">
     <h2>Admin - Orders</h2>
 
+    <!-- 🔍 Filter Dropdown -->
+    <div class="order-filter">
+      <label>
+        Filter by Status:
+        <select v-model="statusFilter" @change="fetchOrders">
+          <option value="">All</option>
+          <option v-for="(label, key) in statusLabels" :key="key" :value="key">
+            {{ label }}
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <!-- 📋 Order Table -->
     <table v-if="paginatedOrders.length" class="orders-table">
       <thead>
         <tr>
@@ -29,12 +43,7 @@
             </select>
           </td>
           <td>
-            <router-link
-              :to="`/admin/orders/${o.orderId}`"
-              class="detail-link"
-            >
-              View
-            </router-link>
+            <router-link :to="`/admin/orders/${o.orderId}`" class="detail-link">View</router-link>
           </td>
         </tr>
       </tbody>
@@ -42,13 +51,11 @@
 
     <div v-else class="no-orders">No orders found.</div>
 
-    <!-- Pagination buttons -->
+    <!-- Pagination -->
     <div class="pagination" v-if="totalPages > 1">
       <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
       <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">
-        Next
-      </button>
+      <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">Next</button>
     </div>
   </div>
 </template>
@@ -57,6 +64,7 @@
 import { ref, computed, onMounted } from "vue";
 import { getOrders, updateOrderStatus } from "../../api/orders";
 
+// 🧾 Status enums
 const statusOptions = {
   1: "IN_PROGRESS",
   2: "ORDER_RECEIVED",
@@ -78,9 +86,7 @@ const statusLabels = {
 };
 
 function getStatusIdByName(enumName) {
-  return (
-    Object.entries(statusOptions).find(([, name]) => name === enumName)?.[0] ?? null
-  );
+  return Object.entries(statusOptions).find(([, name]) => name === enumName)?.[0] ?? null;
 }
 
 function filteredStatusOptions(currentEnum) {
@@ -90,26 +96,33 @@ function filteredStatusOptions(currentEnum) {
   );
 }
 
+// 🔄 Refs
 const allOrders = ref([]);
 const tempStatus = ref({});
+const statusFilter = ref("");
 
-// Pagination setup
+// 📄 Pagination
 const currentPage = ref(0);
 const pageSize = ref(5);
 
-const totalPages = computed(() =>
-  Math.ceil(allOrders.value.length / pageSize.value)
-);
+const filteredOrders = computed(() => {
+  let orders = [...allOrders.value];
+  if (statusFilter.value) {
+    orders = orders.filter(o => o.status === statusFilter.value);
+  }
+  return orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // latest first
+});
+
+const totalPages = computed(() => Math.ceil(filteredOrders.value.length / pageSize.value));
 
 const paginatedOrders = computed(() => {
   const start = currentPage.value * pageSize.value;
-  return allOrders.value.slice(start, start + pageSize.value);
+  return filteredOrders.value.slice(start, start + pageSize.value);
 });
 
 function nextPage() {
   if (currentPage.value + 1 < totalPages.value) currentPage.value++;
 }
-
 function prevPage() {
   if (currentPage.value > 0) currentPage.value--;
 }
@@ -122,27 +135,30 @@ async function changeStatus(order) {
     const statusId = getStatusIdByName(newStatus);
     await updateOrderStatus(order.id, statusId);
     order.status = newStatus;
-    console.log(`✅ Order ${order.orderId} status updated to ${newStatus}`);
   } catch (e) {
-    console.error(`❌ Failed to update order ${order.orderId}`, e);
+    console.error(`Failed to update order ${order.orderId}`, e);
     tempStatus.value[order.id] = order.status; // revert
   }
 }
 
-onMounted(async () => {
+async function fetchOrders() {
   try {
     const { data } = await getOrders();
     allOrders.value = data.content || [];
 
-    data.content.forEach((o) => {
+    // Save statuses
+    allOrders.value.forEach(o => {
       tempStatus.value[o.id] = o.status;
     });
+
+    currentPage.value = 0;
   } catch (e) {
     console.error("Failed to fetch orders", e);
   }
-});
-</script>
+}
 
+onMounted(fetchOrders);
+</script>
 
 <style scoped>
 .admin-orders-wrapper {
@@ -155,6 +171,19 @@ h2 {
   text-align: center;
   margin-bottom: 2rem;
   color: #333;
+}
+
+.order-filter {
+  text-align: right;
+  max-width: 1000px;
+  margin: 0 auto 1rem;
+}
+
+.order-filter select {
+  padding: 0.4rem;
+  font-size: 0.95rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 .orders-table {
@@ -197,6 +226,7 @@ select {
   color: #777;
   margin-top: 2rem;
 }
+
 .pagination {
   text-align: center;
   margin-top: 1.5rem;
@@ -216,5 +246,4 @@ select {
   background-color: #ccc;
   cursor: not-allowed;
 }
-
 </style>

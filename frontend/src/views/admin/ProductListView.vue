@@ -1,10 +1,24 @@
 <template>
   <div class="admin-products-wrapper">
     <h2>Admin - Products</h2>
+
+    <!-- Create Button -->
     <div class="header">
       <router-link to="/admin/products/create" class="create-link">+ Create Product</router-link>
     </div>
-    <div class="table-wrapper" v-if="products.length">
+
+    <!-- 🔍 Search Bar -->
+    <div class="search-bar">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search by title or description..."
+        class="search-input"
+      />
+    </div>
+
+    <!-- Product Table -->
+    <div class="table-wrapper" v-if="filteredProducts.length">
       <table class="products-table">
         <thead>
           <tr>
@@ -20,10 +34,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="p in products" :key="p.id">
+          <tr v-for="p in filteredProducts" :key="p.id">
             <td>
-              <img :src="p.image ? `/uploads/product_img/${p.image}` : '/default-product.png'" alt="product image"
-                class="product-thumbnail" />
+              <img
+                :src="p.image ? `/uploads/product_img/${p.image}` : '/default-product.png'"
+                alt="product image"
+                class="product-thumbnail"
+              />
             </td>
             <td>{{ p.title }}</td>
             <td>{{ p.description }}</td>
@@ -40,25 +57,41 @@
         </tbody>
       </table>
     </div>
-    <div v-else class="no-products">No products available.</div>
+
+    <!-- No Results -->
+    <div v-else class="no-products">No products found.</div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { getProducts, deleteProduct } from "../../api/products";
+import { ref, onMounted, computed } from 'vue'
+import { getProducts, deleteProduct } from '../../api/products'
 
-const products = ref([]);
+const products = ref([])
+const searchQuery = ref('')
+
+// Fetch data
 async function fetch() {
-  const { data } = await getProducts();
-  products.value = data;
+  const { data } = await getProducts()
+  products.value = data
 }
-onMounted(fetch);
+onMounted(fetch)
 
+// Search filter
+const filteredProducts = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim()
+  if (!query) return products.value
+  return products.value.filter(p =>
+    p.title.toLowerCase().includes(query) ||
+    p.description?.toLowerCase().includes(query)
+  )
+})
+
+// Delete product
 async function remove(id) {
-  if (confirm("Are you sure you want to delete this product?")) {
-    await deleteProduct(id);
-    fetch();
+  if (confirm('Are you sure you want to delete this product?')) {
+    await deleteProduct(id)
+    fetch()
   }
 }
 </script>
@@ -88,9 +121,21 @@ h2 {
   text-decoration: none;
   font-weight: bold;
 }
-
 .create-link:hover {
   background: #6920d4;
+}
+
+.search-bar {
+  margin-bottom: 1rem;
+  text-align: right;
+}
+.search-input {
+  padding: 0.5rem 1rem;
+  width: 300px;
+  max-width: 100%;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
 
 .table-wrapper {
@@ -148,5 +193,6 @@ h2 {
   text-align: center;
   font-size: 1.1rem;
   color: #777;
+  margin-top: 2rem;
 }
 </style>

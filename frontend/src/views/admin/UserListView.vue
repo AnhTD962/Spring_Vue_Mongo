@@ -2,21 +2,31 @@
   <div class="admin-users-wrapper">
     <h2>Admin - Users</h2>
 
+    <!-- Header: Filter & Add -->
     <div class="users-header">
-      <label>
-        Filter:
-        <select v-model="filter" @change="fetchUsers">
-          <option value="">All</option>
-          <option value="1">User</option>
-          <option value="2">Admin</option>
-        </select>
-      </label>
+      <div class="filters">
+        <label>
+          Role:
+          <select v-model="filter" @change="fetchUsers">
+            <option value="">All</option>
+            <option value="1">User</option>
+            <option value="2">Admin</option>
+          </select>
+        </label>
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Search name or email..."
+          class="search-input"
+        />
+      </div>
 
       <router-link to="/admin/add-new-admin">
         <button class="add-btn">+ Add New Admin</button>
       </router-link>
     </div>
 
+    <!-- Users Table -->
     <table class="users-table" v-if="paginatedUsers.length">
       <thead>
         <tr>
@@ -48,8 +58,10 @@
       </tbody>
     </table>
 
+    <!-- No Users -->
     <div v-else class="no-users">No users found.</div>
 
+    <!-- Pagination -->
     <div class="pagination" v-if="totalPages > 1">
       <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
       <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
@@ -64,16 +76,27 @@ import { getUsers, toggleUserStatus } from "../../api/users";
 
 const allUsers = ref([]);
 const filter = ref("");
+const searchQuery = ref("");
 const currentPage = ref(0);
 const pageSize = 5;
 
+// Filtered by name/email
+const filteredUsers = computed(() => {
+  const q = searchQuery.value.toLowerCase().trim();
+  if (!q) return allUsers.value;
+  return allUsers.value.filter(
+    (u) =>
+      u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+  );
+});
+
 const totalPages = computed(() =>
-  Math.ceil(allUsers.value.length / pageSize)
+  Math.ceil(filteredUsers.value.length / pageSize)
 );
 
 const paginatedUsers = computed(() => {
   const start = currentPage.value * pageSize;
-  return allUsers.value.slice(start, start + pageSize);
+  return filteredUsers.value.slice(start, start + pageSize);
 });
 
 function nextPage() {
@@ -114,8 +137,16 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 900px;
+  flex-wrap: wrap;
+  max-width: 1000px;
   margin: 0 auto 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 select {
@@ -123,6 +154,14 @@ select {
   border-radius: 4px;
   border: 1px solid #ccc;
   font-size: 0.95rem;
+}
+
+.search-input {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 220px;
 }
 
 .add-btn {

@@ -2,10 +2,22 @@
   <div class="admin-categories-wrapper">
     <h2>Admin - Categories</h2>
 
+    <!-- Create Button -->
     <div class="header">
       <router-link to="/admin/categories/create" class="create-link">+ Create Category</router-link>
     </div>
 
+    <!-- 🔍 Search Bar -->
+    <div class="search-bar">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search by category name..."
+        class="search-input"
+      />
+    </div>
+
+    <!-- Categories Table -->
     <table class="categories-table" v-if="paginatedCategories.length">
       <thead>
         <tr>
@@ -28,6 +40,7 @@
 
     <div v-else class="no-categories">No categories found.</div>
 
+    <!-- Pagination -->
     <div v-if="totalPages > 1" class="pagination">
       <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
       <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
@@ -41,26 +54,38 @@ import { ref, computed, onMounted } from "vue";
 import { getCategories, deleteCategory } from "../../api/categories";
 
 const allCategories = ref([]);
+const searchQuery = ref("");
 const currentPage = ref(0);
 const pageSize = 5;
 
+// Filtered categories by search
+const filteredCategories = computed(() => {
+  const q = searchQuery.value.toLowerCase().trim();
+  if (!q) return allCategories.value;
+  return allCategories.value.filter(c =>
+    c.name.toLowerCase().includes(q)
+  );
+});
+
+// Pagination based on filtered list
 const totalPages = computed(() =>
-  Math.ceil(allCategories.value.length / pageSize)
+  Math.ceil(filteredCategories.value.length / pageSize)
 );
 
 const paginatedCategories = computed(() => {
   const start = currentPage.value * pageSize;
-  return allCategories.value.slice(start, start + pageSize);
+  return filteredCategories.value.slice(start, start + pageSize);
 });
 
+// Pagination handlers
 function nextPage() {
   if (currentPage.value + 1 < totalPages.value) currentPage.value++;
 }
-
 function prevPage() {
   if (currentPage.value > 0) currentPage.value--;
 }
 
+// Fetch and remove
 async function fetch() {
   const { data } = await getCategories();
   allCategories.value = data;
@@ -107,6 +132,20 @@ h2 {
   background-color: #6920d4;
 }
 
+/* 🔍 Search */
+.search-bar {
+  margin-bottom: 1rem;
+  text-align: right;
+}
+.search-input {
+  padding: 0.5rem 1rem;
+  width: 300px;
+  max-width: 100%;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
 .categories-table {
   width: 100%;
   max-width: 800px;
@@ -142,7 +181,6 @@ h2 {
   border-radius: 4px;
   cursor: pointer;
 }
-
 .delete-btn:hover {
   background-color: #c9302c;
 }
