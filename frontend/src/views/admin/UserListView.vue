@@ -17,7 +17,7 @@
       </router-link>
     </div>
 
-    <table class="users-table" v-if="users.length">
+    <table class="users-table" v-if="paginatedUsers.length">
       <thead>
         <tr>
           <th>Photo</th>
@@ -29,7 +29,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="u in users" :key="u.id">
+        <tr v-for="u in paginatedUsers" :key="u.id">
           <td>
             <img :src="`/uploads/profile_img/${u.profileImage}`" alt="Profile" />
           </td>
@@ -49,20 +49,45 @@
     </table>
 
     <div v-else class="no-users">No users found.</div>
+
+    <div class="pagination" v-if="totalPages > 1">
+      <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
+      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">Next</button>
+    </div>
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { getUsers, toggleUserStatus } from "../../api/users";
 
-const users = ref([]);
+const allUsers = ref([]);
 const filter = ref("");
+const currentPage = ref(0);
+const pageSize = 5;
+
+const totalPages = computed(() =>
+  Math.ceil(allUsers.value.length / pageSize)
+);
+
+const paginatedUsers = computed(() => {
+  const start = currentPage.value * pageSize;
+  return allUsers.value.slice(start, start + pageSize);
+});
+
+function nextPage() {
+  if (currentPage.value + 1 < totalPages.value) currentPage.value++;
+}
+
+function prevPage() {
+  if (currentPage.value > 0) currentPage.value--;
+}
 
 async function fetchUsers() {
   const { data } = await getUsers(filter.value);
-  users.value = data;
+  allUsers.value = data;
+  currentPage.value = 0;
 }
 
 async function toggleStatus(user) {
@@ -72,6 +97,7 @@ async function toggleStatus(user) {
 
 onMounted(fetchUsers);
 </script>
+
 <style scoped>
 .admin-users-wrapper {
   padding: 40px 20px;
@@ -160,5 +186,25 @@ button:hover {
   text-align: center;
   margin-top: 2rem;
   color: #666;
+}
+
+.pagination {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.pagination button {
+  margin: 0 0.5rem;
+  padding: 6px 12px;
+  background: #7b2ff2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>
