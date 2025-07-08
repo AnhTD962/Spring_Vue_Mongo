@@ -1,6 +1,5 @@
 package com.example.backend.config;
 
-import com.example.backend.model.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,27 +9,44 @@ import java.util.Collection;
 
 public class CustomUser implements UserDetails {
 
-    private User user;
+    private final String email;
+    private final String password;
+    private final String role;
+    private final boolean isEnable;
+    private final boolean accountNonLocked;
 
-    public CustomUser(User user) {
-        super();
-        this.user = user;
+    public CustomUser(String email, String password, String role, Boolean isEnable, Boolean accountNonLocked) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.isEnable = Boolean.TRUE.equals(isEnable);
+        this.accountNonLocked = Boolean.TRUE.equals(accountNonLocked);
+    }
+
+    public static CustomUser fromEntity(com.example.backend.model.entity.User user) {
+        return new CustomUser(
+                user.getEmail(),
+                user.getPassword(),
+                user.getRole(),
+                user.getIsEnable(),
+                user.getAccountNonLocked()
+        );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
         return Arrays.asList(authority);
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return email;
     }
 
     @Override
@@ -40,7 +56,7 @@ public class CustomUser implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.getAccountNonLocked();
+        return accountNonLocked;
     }
 
     @Override
@@ -50,7 +66,7 @@ public class CustomUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getIsEnable();
+        return isEnable;
     }
 
 }

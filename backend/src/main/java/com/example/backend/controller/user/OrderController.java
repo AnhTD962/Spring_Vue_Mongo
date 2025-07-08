@@ -8,7 +8,6 @@ import com.example.backend.service.OrderService;
 import com.example.backend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -18,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
-public class UserOrderController {
+public class OrderController {
 
     @Autowired
     private UserService userService;
@@ -27,20 +26,20 @@ public class UserOrderController {
     private OrderService orderService;
 
     @GetMapping("/orders")
-    public ResponseEntity<List<Order>> getMyOrders(Principal principal) {
+    public List<Order> getMyOrders(Principal principal) {
         User user = userService.getUserByEmail(principal.getName());
-        return ResponseEntity.ok(orderService.getOrdersByUser(user.getId()));
+        return orderService.getOrdersByUser(user.getId());
     }
 
     @PostMapping("/order")
-    public ResponseEntity<?> placeOrder(@RequestBody OrderRequestDTO request, Principal principal) throws Exception {
+    public String placeOrder(@RequestBody OrderRequestDTO request, Principal principal) throws Exception {
         User user = userService.getUserByEmail(principal.getName());
         orderService.saveOrder(user.getId(), request);
-        return ResponseEntity.ok("Order placed successfully");
+        return "Order placed successfully";
     }
 
     @GetMapping("/orders/{id}")
-    public ResponseEntity<OrderDetailResponseDTO> getOrderById(@PathVariable String id) {
-        return ResponseEntity.ok(orderService.getOrderDetail(id));
+    public OrderDetailResponseDTO getOrderById(@PathVariable String id) {
+        return orderService.getOrderDetail(id);
     }
 }

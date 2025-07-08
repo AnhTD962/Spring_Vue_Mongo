@@ -248,6 +248,7 @@ public class UserServiceImpl implements UserService {
         return "Password changed successfully";
     }
 
+    @Override
     public void uploadUserImage(MultipartFile file, String uploadDir) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
         if (!Files.exists(uploadPath)) {

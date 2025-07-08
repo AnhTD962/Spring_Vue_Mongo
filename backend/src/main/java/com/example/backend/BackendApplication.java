@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-//@SpringBootApplication
 @EnableMongoAuditing
 @EnableTransactionManagement
 
