@@ -1,6 +1,5 @@
 package com.example.backend.controller.admin;
 
-import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.model.entity.User;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
-public class ProfileController {
+public class AdminProfileController {
 
     @Autowired
     private UserService userService;
