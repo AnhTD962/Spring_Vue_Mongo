@@ -1,4 +1,4 @@
-package com.example.backend.controller.admin;
+package com.example.backend.controller;
 
 import com.example.backend.exception.BusinessException;
 import com.example.backend.exception.NotFoundException;
@@ -58,7 +58,7 @@ public class UserController {
             user.setProfileImage("default.jpg");
         }
 
-        userService.saveAdmin(user); // May throw IllegalArgumentException
+        userService.saveAdmin(user);
         return "Register successfully";
     }
 }

@@ -1,4 +1,4 @@
-package com.example.backend.controller.admin;
+package com.example.backend.controller;
 
 import com.example.backend.exception.BusinessException;
 import com.example.backend.exception.NotFoundException;
@@ -28,7 +28,7 @@ public class ProductController {
     public Product updateProduct(@PathVariable String id,
                                  @ModelAttribute Product product,
                                  @RequestParam(value = "file", required = false) MultipartFile image) {
-        product.setId(id); // ensure correct ID
+        product.setId(id);
         return productService.updateProduct(product, image);
     }
 

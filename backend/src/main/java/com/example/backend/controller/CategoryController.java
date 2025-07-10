@@ -1,4 +1,4 @@
-package com.example.backend.controller.admin;
+package com.example.backend.controller;
 
 import com.example.backend.model.entity.Category;
 import com.example.backend.service.CategoryService;

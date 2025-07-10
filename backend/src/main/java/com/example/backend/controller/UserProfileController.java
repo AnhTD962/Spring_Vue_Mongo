@@ -1,4 +1,4 @@
-package com.example.backend.controller.user;
+package com.example.backend.controller;
 
 import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.model.entity.User;
@@ -13,23 +13,20 @@ import java.security.Principal;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
-public class ProfileController {
+public class UserProfileController {
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @GetMapping("/profile")
+    @GetMapping("/user/profile")
     public User getUserProfile(Principal principal) {
         return userService.getProfile(principal);
     }
 
-    @PutMapping("/profile")
-    public User updateProfile(
+    @PutMapping("/user/profile")
+    public User updateUserProfile(
             @ModelAttribute User user,
             @RequestParam(value = "img", required = false) MultipartFile img,
             Principal principal
@@ -37,8 +34,28 @@ public class ProfileController {
         return userService.updateUserProfile(principal, user, img);
     }
 
-    @PutMapping("/change-password")
+    @PutMapping("/user/change-password")
     public String changePassword(@RequestBody ChangePasswordRequestDTO request, Principal principal) {
+        userService.changePassword(principal, request);
+        return "Password changed successfully";
+    }
+
+    @GetMapping("/admin/profile")
+    public User getAdminProfile(Principal principal) {
+        return userService.getProfile(principal);
+    }
+
+    @PutMapping("/admin/profile")
+    public User updateAdminProfile(
+            @ModelAttribute User user,
+            @RequestParam(value = "img", required = false) MultipartFile img,
+            Principal principal
+    ) {
+        return userService.updateUserProfile(principal, user, img);
+    }
+
+    @PutMapping("/admin/change-password")
+    public String changeAdminPassword(@RequestBody ChangePasswordRequestDTO request, Principal principal) {
         userService.changePassword(principal, request);
         return "Password changed successfully";
     }

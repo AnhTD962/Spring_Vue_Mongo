@@ -1,4 +1,4 @@
-package com.example.backend.controller.user;
+package com.example.backend.controller;
 
 import com.example.backend.controller.dto.request.CartRequestDTO;
 import com.example.backend.controller.dto.response.CartListResponseDTO;

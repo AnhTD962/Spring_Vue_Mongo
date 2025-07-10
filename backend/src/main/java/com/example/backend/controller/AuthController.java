@@ -1,4 +1,4 @@
-package com.example.backend.controller.auth;
+package com.example.backend.controller;
 
 import com.example.backend.controller.dto.request.ForgotPasswordRequestDTO;
 import com.example.backend.controller.dto.request.SigninRequestDTO;
