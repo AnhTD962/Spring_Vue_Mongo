@@ -16,6 +16,10 @@ export function logout() {
     return api.post("/signout");
 }
 
+export function refreshToken(refreshToken) {
+  return api.post("/refresh-token", { refreshToken });
+}
+
 export function getUserProfile() {
     return api.get("/user/profile");
 }

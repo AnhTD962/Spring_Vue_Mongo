@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.controller.dto.request.SigninRequestDTO;
+import com.example.backend.controller.dto.response.AuthResponseDTO;
 import com.example.backend.model.entity.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,9 +41,9 @@ public interface UserService {
 
     String changePassword(Principal principal, ChangePasswordRequestDTO request);
 
-    String registerUser(User user, MultipartFile avatar);
+    AuthResponseDTO  registerUser(User user, MultipartFile avatar);
 
-    Map<String, Object> login(SigninRequestDTO loginRequest, HttpSession session);
+    AuthResponseDTO login(SigninRequestDTO loginRequest);
 
     String forgotPasswordAndSendNewPassword(String email);
 }

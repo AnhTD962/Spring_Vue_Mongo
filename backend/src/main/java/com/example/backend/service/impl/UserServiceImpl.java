@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.controller.dto.request.SigninRequestDTO;
+import com.example.backend.controller.dto.response.AuthResponseDTO;
 import com.example.backend.model.entity.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtils;
@@ -57,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String registerUser(User user, MultipartFile avatar) {
+    public AuthResponseDTO  registerUser(User user, MultipartFile avatar) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
@@ -88,14 +89,17 @@ public class UserServiceImpl implements UserService {
         try {
             commonUtil.sendWelcomeEmail(user.getEmail(), user.getName());
         } catch (Exception e) {
-            return "User registered, but failed to send confirmation email: " + e.getMessage();
+            throw new RuntimeException("Failed to send email", e);
         }
 
-        return "User registered successfully. Confirmation email sent.";
+        String token = jwtUtils.generateAccessToken(user.getEmail(), user.getRole());
+        String refreshToken = jwtUtils.generateRefreshToken(user.getEmail());
+
+        return new AuthResponseDTO(token, refreshToken, user.getEmail(), user.getName(), user.getRole(), user.getProfileImage());
     }
 
     @Override
-    public Map<String, Object> login(SigninRequestDTO loginRequest, HttpSession session) {
+    public AuthResponseDTO login(SigninRequestDTO loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -106,19 +110,12 @@ public class UserServiceImpl implements UserService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = getUserByEmail(loginRequest.getEmail());
-            String jwt = jwtUtils.generateJwtToken(user.getEmail());
+            String jwt = jwtUtils.generateAccessToken(user.getEmail(), user.getRole());
+            String refreshToken = jwtUtils.generateRefreshToken(user.getEmail());
 
-            return Map.of(
-                    "success", true,
-                    "message", "Login successful",
-                    "user", user,
-                    "token", jwt
-            );
+            return new AuthResponseDTO(jwt, refreshToken, user.getEmail(), user.getName(), user.getRole(), user.getProfileImage());
         } catch (Exception e) {
-            return Map.of(
-                    "success", false,
-                    "message", "Invalid credentials"
-            );
+            throw new RuntimeException("Invalid credentials");
         }
     }
 

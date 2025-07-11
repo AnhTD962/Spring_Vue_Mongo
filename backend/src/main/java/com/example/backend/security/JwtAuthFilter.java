@@ -1,5 +1,6 @@
 package com.example.backend.security;
 
+import com.example.backend.config.CustomUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,14 +32,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7);
-            username = jwtUtils.getUserNameFromJwtToken(token);
+            try {
+                username = jwtUtils.getUserNameFromJwtToken(token);
+            } catch (Exception e) {
+                logger.error("Invalid JWT Token", e);
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtils.validateJwtToken(token)) {
+                // 👇 Lấy role từ token
+                String role = jwtUtils.getRoleFromToken(token);
+
+                // 👇 Tạo CustomUser giả (không gọi DB)
+                CustomUser userDetails = new CustomUser(username, "", role, true, true);
+
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(username, null, null);
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
