@@ -1,7 +1,7 @@
 import api from "./axios";
 
-export function getOrders(params = { pageNo: 0, pageSize: 10 }) {
-  return api.get("/admin/orders", { params });
+export function getOrders() {
+  return api.get("/admin/orders");
 }
 
 export function getOrder(orderId) {

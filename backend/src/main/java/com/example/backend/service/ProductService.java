@@ -9,18 +9,18 @@ public interface ProductService {
 
     Product saveProduct(Product product, MultipartFile image);
 
-    List<Product> getAllProducts();
-
-    Boolean deleteProduct(String id);
-
     Product getProductById(String id);
-
-    Product updateProduct(Product product, MultipartFile file);
-
-    List<Product> searchProduct(String ch);
 
     List<Product> findByIsActiveTrue();
 
     List<Product> getProductsByCategory(String categoryName);
+
+    Product updateProductById(String id, Product product, MultipartFile image);
+
+    List<Product> getProducts(String searchTerm);
+
+    Product getProductOrThrow(String id);
+
+    String deleteProductOrThrow(String id);
 
 }

@@ -5,10 +5,9 @@ export function getCart() {
 }
 
 export function addToCart(payload) {
-  return api.post("/user/cart/add", {
+  return api.post("/user/cart", {
     pid: payload.productId,
-    uid: payload.userId,
-    quantity: payload.quantity 
+    quantity: payload.quantity
   });
 }
 

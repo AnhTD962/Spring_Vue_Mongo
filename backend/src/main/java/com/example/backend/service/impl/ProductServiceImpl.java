@@ -1,5 +1,6 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.exception.NotFoundException;
 import com.example.backend.model.entity.Product;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.service.ProductService;
@@ -55,19 +56,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public String deleteProductOrThrow(String id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found with ID: " + id));
+
+        productRepository.delete(product);
+        return "Product deleted successfully";
     }
 
     @Override
-    public Boolean deleteProduct(String id) {
-        Product product = productRepository.findById(id).orElse(null);
-
-        if (!ObjectUtils.isEmpty(product)) {
-            productRepository.delete(product);
-            return true;
-        }
-        return false;
+    public Product getProductOrThrow(String id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product not found with ID: " + id));
     }
 
     @Override
@@ -81,27 +81,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product updateProduct(Product product, MultipartFile image) {
-        Product dbProduct = getProductById(product.getId());
+    public Product updateProductById(String id, Product updated, MultipartFile image) {
+        Product dbProduct = getProductById(id);
         if (dbProduct == null) {
-            throw new RuntimeException("Product not found with ID: " + product.getId());
+            throw new NotFoundException("Product not found with ID: " + id);
         }
 
-        dbProduct.setTitle(product.getTitle());
-        dbProduct.setDescription(product.getDescription());
-        dbProduct.setCategory(product.getCategory());
-        dbProduct.setPrice(product.getPrice());
-        dbProduct.setStock(product.getStock());
-        dbProduct.setIsActive(product.getIsActive());
+        dbProduct.setTitle(updated.getTitle());
+        dbProduct.setDescription(updated.getDescription());
+        dbProduct.setCategory(updated.getCategory());
+        dbProduct.setPrice(updated.getPrice());
+        dbProduct.setStock(updated.getStock());
+        dbProduct.setIsActive(updated.getIsActive());
 
-        double discount = product.getDiscount() != null ? product.getDiscount() : 0.0;
+        double discount = updated.getDiscount() != null ? updated.getDiscount() : 0.0;
         dbProduct.setDiscount(discount);
-        if (product.getPrice() != null) {
-            double discountAmount = product.getPrice() * (discount / 100.0);
-            dbProduct.setDiscountPrice(product.getPrice() - discountAmount);
+
+        if (updated.getPrice() != null) {
+            double discountAmount = updated.getPrice() * (discount / 100.0);
+            dbProduct.setDiscountPrice(updated.getPrice() - discountAmount);
         }
 
-        // Handle image upload
         if (image != null && !image.isEmpty()) {
             try {
                 String ext = image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf("."));
@@ -114,19 +114,29 @@ public class ProductServiceImpl implements ProductService {
 
                 Path path = uploadDir.resolve(uniqueName);
                 Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                dbProduct.setImage(uniqueName); // update image name in DB
+                dbProduct.setImage(uniqueName);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException("Failed to upload image", e);
             }
         }
 
         return productRepository.save(dbProduct);
     }
 
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
 
-    @Override
     public List<Product> searchProduct(String ch) {
         return productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(ch, ch);
+    }
+
+    @Override
+    public List<Product> getProducts(String ch) {
+        if (ch == null || ch.trim().isEmpty()) {
+            return getAllProducts();
+        }
+        return searchProduct(ch);
     }
 
     @Override

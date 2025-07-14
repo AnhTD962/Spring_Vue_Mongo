@@ -3,6 +3,8 @@ package com.example.backend.service.impl;
 import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.controller.dto.request.SigninRequestDTO;
 import com.example.backend.controller.dto.response.AuthResponseDTO;
+import com.example.backend.exception.BusinessException;
+import com.example.backend.exception.NotFoundException;
 import com.example.backend.model.entity.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtils;
@@ -138,11 +140,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(String id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -150,45 +147,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsers(String role) {
         return userRepository.findByRole(role);
-    }
-
-    @Override
-    public Boolean updateAccountStatus(String id, Boolean status) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setIsEnable(status);
-            userRepository.save(user);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void increaseFailedAttempt(User user) {
-        user.setFailedAttempt(user.getFailedAttempt() + 1);
-        userRepository.save(user);
-    }
-
-    @Override
-    public void userAccountLock(User user) {
-        user.setAccountNonLocked(false);
-        user.setLockTime(new Date());
-        userRepository.save(user);
-    }
-
-    @Override
-    public boolean unlockAccountTimeExpired(User user) {
-        long lockTime = user.getLockTime().getTime();
-        long unlockTime = lockTime + AppConstant.UNLOCK_DURATION_TIME;
-        if (System.currentTimeMillis() > unlockTime) {
-            user.setAccountNonLocked(true);
-            user.setFailedAttempt(0);
-            user.setLockTime(null);
-            userRepository.save(user);
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -293,5 +251,85 @@ public class UserServiceImpl implements UserService {
         return sb.toString();
     }
 
+    @Override
+    public AuthResponseDTO refreshToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new BusinessException("Refresh token is missing");
+        }
+
+        if (!jwtUtils.validateJwtToken(refreshToken)) {
+            throw new BusinessException("Invalid token");
+        }
+
+        if (!jwtUtils.isRefreshToken(refreshToken)) {
+            throw new BusinessException("This is not a refresh token");
+        }
+
+        String email = jwtUtils.getUserNameFromJwtToken(refreshToken);
+        User user = getUserByEmail(email);
+        if (user == null) {
+            throw new BusinessException("User not found");
+        }
+
+        String newAccessToken = jwtUtils.generateAccessToken(email, user.getRole());
+
+        return new AuthResponseDTO(newAccessToken, refreshToken, email, user.getName(), user.getRole(), user.getProfileImage());
+    }
+
+    @Override
+    public String signout(HttpSession session) {
+        session.invalidate();
+        return "Logout successful";
+    }
+
+    @Override
+    public String registerAdmin(User user, MultipartFile file) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new BusinessException("Email already exists");
+        }
+
+        if (file != null && !file.isEmpty()) {
+            String filename = file.getOriginalFilename();
+            user.setProfileImage(filename);
+            try {
+                uploadUserImage(file, "uploads/profile_img");
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload profile image", e);
+            }
+        } else {
+            user.setProfileImage("default.jpg");
+        }
+
+        saveAdmin(user);
+        return "Register successfully";
+    }
+
+    @Override
+    public String updateAccountStatusOrThrow(String id, Boolean status) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new NotFoundException("User not found");
+        }
+        User user = optionalUser.get();
+        user.setIsEnable(status);
+        userRepository.save(user);
+        return "Account Status Updated";
+    }
+
+    @Override
+    public User getUserOrThrow(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
+    }
+
+    @Override
+    public List<User> getUsersByType(Integer type) {
+        if (type == null) return getAllUsers();
+        return switch (type) {
+            case 1 -> getUsers("ROLE_USER");
+            case 2 -> getUsers("ROLE_ADMIN");
+            default -> getAllUsers();
+        };
+    }
 
 }

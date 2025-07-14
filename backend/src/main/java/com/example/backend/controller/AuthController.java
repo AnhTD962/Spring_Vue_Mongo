@@ -22,9 +22,6 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private JwtUtils jwtUtils;
-
     @PostMapping("/register")
     public AuthResponseDTO registerUser(@ModelAttribute User user,
                                         @RequestParam(value = "avatar", required = false) MultipartFile avatar) {
@@ -33,51 +30,21 @@ public class AuthController {
 
     @PostMapping("/signin")
     public AuthResponseDTO signin(@RequestBody SigninRequestDTO loginRequest) {
-        AuthResponseDTO response = userService.login(loginRequest);
-        if (response == null || response.getAccessToken() == null) {
-            throw new BusinessException("Invalid email or password");
-        }
-        return response;
+        return userService.login(loginRequest);
     }
 
     @PostMapping("/refresh-token")
     public AuthResponseDTO refreshToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
-        if (refreshToken == null || refreshToken.isBlank()) {
-            throw new BusinessException("Refresh token is missing");
-        }
-
-        if (!jwtUtils.validateJwtToken(refreshToken)) {
-            throw new BusinessException("Invalid token");
-        }
-
-        if (!jwtUtils.isRefreshToken(refreshToken)) {
-            throw new BusinessException("This is not a refresh token");
-        }
-
-        String email = jwtUtils.getUserNameFromJwtToken(refreshToken);
-        User user = userService.getUserByEmail(email);
-        if (user == null) {
-            throw new BusinessException("User not found");
-        }
-
-        String newAccessToken = jwtUtils.generateAccessToken(email, user.getRole());
-
-        return new AuthResponseDTO(newAccessToken, refreshToken, email, user.getName(), user.getRole(), user.getProfileImage());
+        return userService.refreshToken(request.get("refreshToken"));
     }
 
     @PostMapping("/signout")
     public String signout(HttpSession session) {
-        session.invalidate();
-        return "Logout successful";
+        return userService.signout(session);
     }
 
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestBody ForgotPasswordRequestDTO request) {
-        String result = userService.forgotPasswordAndSendNewPassword(request.getEmail());
-        if (result.startsWith("Error") || result.startsWith("Failed")) {
-            throw new RuntimeException(result);
-        }
-        return result;
+        return userService.forgotPasswordAndSendNewPassword(request.getEmail());
     }
 }

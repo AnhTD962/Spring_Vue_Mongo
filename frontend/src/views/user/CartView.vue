@@ -4,15 +4,19 @@
     <h2 v-else><router-link to="/products">Buy now</router-link></h2>
     <ul>
       <li v-for="item in items" :key="item.id">
-        <div>
-          <strong>{{ item.title }}</strong> ({{ item.category }})<br />
-          Quantity:
-          <input type="number" v-model.number="item.quantity" min="1" @change="updateQuantity(item.id, item.quantity)"
-            style="width: 50px" />
-          <br />
-          Total: ${{ item.totalPrice?.toFixed(2) || "0.00" }}
+        <div class="cart-item">
+          <img v-if="item.productImage" :src="`/uploads/product_img/${item.productImage}`" alt="Product Image" class="product-img" />
+          <div class="cart-item-details">
+            <strong>{{ item.title }}</strong> ({{ item.category }})<br />
+            Quantity:
+            <input type="number" v-model.number="item.quantity" min="1" @change="updateQuantity(item.id, item.quantity)"
+              style="width: 50px" />
+            <br />
+            Total: ${{ item.totalPrice?.toFixed(2) || "0.00" }}
+            <br />
+            <button @click="remove(item.id)">Remove</button>
+          </div>
         </div>
-        <button @click="remove(item.id)">Remove</button>
       </li>
     </ul>
     <hr v-if="items.length > 0" />
@@ -133,6 +137,20 @@ async function checkout() {
 </script>
 
 <style scoped>
+.cart-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.product-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
 ul {
   padding-left: 0;
   list-style: none;
@@ -171,7 +189,9 @@ button:hover {
   background: #6920d4;
 }
 
-h2, h3, h4 {
+h2,
+h3,
+h4 {
   text-align: center;
   margin-top: 2rem;
   color: #333;

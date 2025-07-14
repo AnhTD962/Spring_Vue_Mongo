@@ -11,49 +11,38 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/products")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class ProductController {
 
     @Autowired
     private ProductService productService;
 
-    @PostMapping("/products")
+    @PostMapping
     public Product saveProduct(@ModelAttribute Product product,
                                @RequestParam(value = "file", required = false) MultipartFile image) {
         return productService.saveProduct(product, image);
     }
 
-    @PutMapping("/products/{id}")
+    @PutMapping("/{id}")
     public Product updateProduct(@PathVariable String id,
                                  @ModelAttribute Product product,
                                  @RequestParam(value = "file", required = false) MultipartFile image) {
-        product.setId(id);
-        return productService.updateProduct(product, image);
+        return productService.updateProductById(id, product, image);
     }
 
-    @GetMapping("/products")
+    @GetMapping
     public List<Product> getProducts(@RequestParam(defaultValue = "") String ch) {
-        return (ch != null && !ch.trim().isEmpty())
-                ? productService.searchProduct(ch)
-                : productService.getAllProducts();
+        return productService.getProducts(ch);
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/{id}")
     public Product getProductById(@PathVariable String id) {
-        Product product = productService.getProductById(id);
-        if (product == null) {
-            throw new NotFoundException("Product not found");
-        }
-        return product;
+        return productService.getProductOrThrow(id);
     }
 
-    @DeleteMapping("/products/{id}")
+    @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable String id) {
-        boolean deleted = productService.deleteProduct(id);
-        if (!deleted) {
-            throw new BusinessException("Failed to delete product");
-        }
-        return "Product deleted successfully";
+        return productService.deleteProductOrThrow(id);
     }
 }

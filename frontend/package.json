@@ -17,7 +17,11 @@
     "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
     "@vitejs/plugin-vue": "^5.2.3",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2"
   },

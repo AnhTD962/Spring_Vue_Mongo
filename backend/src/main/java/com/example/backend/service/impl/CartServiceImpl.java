@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +31,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public Cart saveCart(String productId, String userId, Integer quantity) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Cart saveCart(String productId, Integer quantity, Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        String userId = user.getId();
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -72,6 +77,7 @@ public class CartServiceImpl implements CartService {
 
 
 
+
     @Override
     public CartListResponseDTO getCartWithTotal(String userId) {
         List<Cart> carts = cartRepository.findByUserId(userId);
@@ -92,6 +98,7 @@ public class CartServiceImpl implements CartService {
 
             items.add(new CartResponseDTO(
                     cart.getId(),
+                    cart.getProduct() != null ? cart.getProduct().getImage() : null,
                     cart.getProduct() != null ? cart.getProduct().getId() : null,
                     cart.getProduct() != null ? cart.getProduct().getTitle() : "Unknown",
                     cart.getProduct() != null ? cart.getProduct().getCategory() : "Unknown",

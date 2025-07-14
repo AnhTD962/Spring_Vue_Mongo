@@ -3,8 +3,8 @@ package com.example.backend.service;
 import com.example.backend.controller.dto.request.OrderRequestDTO;
 import com.example.backend.controller.dto.response.OrderDetailResponseDTO;
 import com.example.backend.model.entity.Order;
-import org.springframework.data.domain.Page;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface OrderService {
@@ -12,15 +12,17 @@ public interface OrderService {
 
     List<Order> getOrdersByUser(String userId);
 
-    Order updateOrderStatus(String id, Integer statusId);
-
     List<Order> getAllOrders();
 
-    Order getOrdersByOrderId(String orderId);
+    Order getOrderOrThrow(String orderId);
 
-    Page<Order> getAllOrdersPagination(Integer pageNo, Integer pageSize);
-
-    OrderDetailResponseDTO getOrderDetail(String id);
+    String updateOrderStatusOrThrow(String orderId, Integer statusId);
 
     Order searchOrderByOrderId(String orderId);
+
+    List<Order> getOrdersByPrincipal(Principal principal);
+
+    String placeOrderFromPrincipal(Principal principal, OrderRequestDTO request) throws Exception;
+
+    OrderDetailResponseDTO getOrderDetail(String id);
 }

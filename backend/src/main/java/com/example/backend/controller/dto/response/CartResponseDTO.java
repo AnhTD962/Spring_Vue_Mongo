@@ -7,6 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class CartResponseDTO {
     private String id; // cartId
+    private String productImage;
     private String productId;
     private String title;
     private String category;

@@ -20,45 +20,23 @@ public class UserController {
 
     @GetMapping("/users")
     public List<User> getAllUsers(@RequestParam(value = "type", required = false) Integer type) {
-        return (type == null)
-                ? userService.getAllUsers()
-                : switch (type) {
-            case 1 -> userService.getUsers("ROLE_USER");
-            case 2 -> userService.getUsers("ROLE_ADMIN");
-            default -> userService.getAllUsers();
-        };
+        return userService.getUsersByType(type);
     }
 
     @GetMapping("/users/{id}")
     public User getUserById(@PathVariable String id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            throw new NotFoundException("User not found with ID: " + id);
-        }
-        return user;
+        return userService.getUserOrThrow(id);
     }
 
     @PutMapping("/users/{id}/status")
     public String updateUserAccountStatus(@PathVariable String id,
                                           @RequestParam Boolean status) {
-        boolean updated = userService.updateAccountStatus(id, status);
-        if (!updated) {
-            throw new BusinessException("Failed to update account status");
-        }
-        return "Account Status Updated";
+        return userService.updateAccountStatusOrThrow(id, status);
     }
 
     @PostMapping("/admins")
     public String saveAdmin(@ModelAttribute User user,
-                            @RequestParam(value = "img", required = false) MultipartFile file) throws Exception {
-        if (file != null && !file.isEmpty()) {
-            user.setProfileImage(file.getOriginalFilename());
-            userService.uploadUserImage(file, "uploads/profile_img");
-        } else {
-            user.setProfileImage("default.jpg");
-        }
-
-        userService.saveAdmin(user);
-        return "Register successfully";
+                            @RequestParam(value = "img", required = false) MultipartFile file) {
+        return userService.registerAdmin(user, file);
     }
 }

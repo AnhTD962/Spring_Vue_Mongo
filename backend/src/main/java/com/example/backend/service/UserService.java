@@ -9,9 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 public interface UserService {
+
+    AuthResponseDTO refreshToken(String refreshToken);
+
+    String signout(HttpSession session);
 
     User saveUser(User user);
 
@@ -21,19 +24,9 @@ public interface UserService {
 
     List<User> getAllUsers();
 
-    Boolean updateAccountStatus(String id, Boolean status);
-
-    void increaseFailedAttempt(User user);
-
-    void userAccountLock(User user);
-
-    boolean unlockAccountTimeExpired(User user);
-
     User updateUserProfile(Principal principal, User update, MultipartFile img);
 
     User saveAdmin(User user);
-
-    User getUserById(String id);
 
     void uploadUserImage(MultipartFile file, String folder) throws Exception;
 
@@ -46,4 +39,12 @@ public interface UserService {
     AuthResponseDTO login(SigninRequestDTO loginRequest);
 
     String forgotPasswordAndSendNewPassword(String email);
+
+    List<User> getUsersByType(Integer type);
+
+    User getUserOrThrow(String id);
+
+    String updateAccountStatusOrThrow(String id, Boolean status);
+
+    String registerAdmin(User user, MultipartFile file);
 }

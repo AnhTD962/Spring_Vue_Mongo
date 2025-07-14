@@ -3,11 +3,12 @@ package com.example.backend.service;
 import com.example.backend.controller.dto.response.CartListResponseDTO;
 import com.example.backend.model.entity.Cart;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface CartService {
 
-    public Cart saveCart(String productId, String userId, Integer quantity);
+    public Cart saveCart(String productId, Integer quantity, Principal principal);
 
     public CartListResponseDTO getCartWithTotal(String userId);
 

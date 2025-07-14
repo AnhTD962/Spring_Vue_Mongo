@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.example.backend.controller.dto.request.OrderRequestDTO;
 import com.example.backend.controller.dto.response.OrderDetailResponseDTO;
+import com.example.backend.exception.NotFoundException;
 import com.example.backend.model.entity.*;
 import com.example.backend.model.enums.OrderStatus;
 import com.example.backend.repository.CartRepository;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,25 +95,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getOrdersByUser(String userId) {
-        return orderRepository.findByUserId(userId);
+        return orderRepository.findByUserIdOrderByOrderDateDesc(userId);
     }
 
 
     @Override
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
-    }
-
-    @Override
-    public Order getOrdersByOrderId(String orderId) {
-        return orderRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found with orderId: " + orderId));
-    }
-
-    @Override
-    public Page<Order> getAllOrdersPagination(Integer pageNo, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("orderDate").descending());
-        return orderRepository.findAll(pageable);
     }
 
     @Override
@@ -162,9 +152,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order updateOrderStatus(String id, Integer statusId) {
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+    public Order getOrderOrThrow(String orderId) {
+        return orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found"));
+    }
+
+    @Override
+    public String updateOrderStatusOrThrow(String orderId, Integer statusId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Order not found"));
 
         OrderStatus matchedStatus = null;
         for (OrderStatus os : OrderStatus.values()) {
@@ -179,15 +175,35 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setStatus(matchedStatus);
-        Order updatedOrder = orderRepository.save(order);
+        orderRepository.save(order);
 
         try {
-            commonUtil.sendMailForProductOrder(updatedOrder, matchedStatus.getName());
+            commonUtil.sendMailForProductOrder(order, matchedStatus.getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return updatedOrder;
+        return "Status Updated";
+    }
+
+    @Override
+    public String placeOrderFromPrincipal(Principal principal, OrderRequestDTO request) throws Exception {
+        if (principal == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+        User user = userRepository.findByEmail(principal.getName());
+        saveOrder(user.getId(), request);
+        return "Order placed successfully";
+    }
+
+
+    @Override
+    public List<Order> getOrdersByPrincipal(Principal principal) {
+        if (principal == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+        User user = userRepository.findByEmail(principal.getName());
+        return getOrdersByUser(user.getId());
     }
 
     @Override
