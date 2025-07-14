@@ -53,8 +53,6 @@ public class UserServiceImpl implements UserService {
     public User saveUser(User user) {
         user.setRole("ROLE_USER");
         user.setIsEnable(true);
-        user.setAccountNonLocked(true);
-        user.setFailedAttempt(0);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -128,8 +126,6 @@ public class UserServiceImpl implements UserService {
         }
         user.setRole("ROLE_ADMIN");
         user.setIsEnable(true);
-        user.setAccountNonLocked(true);
-        user.setFailedAttempt(0);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }

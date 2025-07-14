@@ -45,7 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String role = jwtUtils.getRoleFromToken(token);
 
                 // 👇 Tạo CustomUser giả (không gọi DB)
-                CustomUser userDetails = new CustomUser(username, "", role, true, true);
+                CustomUser userDetails = new CustomUser(username, "", role, true);
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

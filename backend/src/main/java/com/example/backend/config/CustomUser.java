@@ -13,14 +13,12 @@ public class CustomUser implements UserDetails {
     private final String password;
     private final String role;
     private final boolean isEnable;
-    private final boolean accountNonLocked;
 
-    public CustomUser(String email, String password, String role, Boolean isEnable, Boolean accountNonLocked) {
+    public CustomUser(String email, String password, String role, Boolean isEnable) {
         this.email = email;
         this.password = password;
         this.role = role;
         this.isEnable = Boolean.TRUE.equals(isEnable);
-        this.accountNonLocked = Boolean.TRUE.equals(accountNonLocked);
     }
 
     public static CustomUser fromEntity(com.example.backend.model.entity.User user) {
@@ -28,8 +26,7 @@ public class CustomUser implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 user.getRole(),
-                user.getIsEnable(),
-                user.getAccountNonLocked()
+                user.getIsEnable()
         );
     }
 
@@ -52,11 +49,6 @@ public class CustomUser implements UserDetails {
     @Override
     public boolean isAccountNonExpired() {
         return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
     }
 
     @Override

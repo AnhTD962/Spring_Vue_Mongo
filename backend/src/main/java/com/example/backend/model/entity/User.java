@@ -43,12 +43,6 @@ public class User {
     @Field("is_enable")
     private Boolean isEnable;
 
-    @Field("account_non_locked")
-    private Boolean accountNonLocked;
-
-    @Field("failed_attempt")
-    private Integer failedAttempt;
-
     @Field("lock_time")
     private Date lockTime;
 
