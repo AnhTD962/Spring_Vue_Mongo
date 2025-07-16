@@ -37,7 +37,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
-import { getProductByCategory } from "../api/categories";
+import { getProductByCategory } from "../api/products";
 
 const route = useRoute();
 const filteredProducts = ref([]);

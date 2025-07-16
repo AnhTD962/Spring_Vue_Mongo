@@ -12,10 +12,6 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.service.OrderService;
 import com.example.backend.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -155,6 +151,19 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderOrThrow(String orderId) {
         return orderRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new NotFoundException("Order not found"));
+    }
+
+    @Override
+    public String bulkUpdateByIds(List<String> ids, String newStatusStr) {
+        OrderStatus newStatus = OrderStatus.valueOf(newStatusStr);
+        List<Order> orders = orderRepository.findAllById(ids);
+
+        for (Order o : orders) {
+            o.setStatus(newStatus);
+        }
+
+        orderRepository.saveAll(orders);
+        return orders.size() + " orders updated to " + newStatus;
     }
 
     @Override

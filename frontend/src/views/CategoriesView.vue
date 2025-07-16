@@ -14,12 +14,12 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { getViewCategories } from "../api/categories";
+import { getCategoryActive } from "../api/categories";
 
 const categories = ref([]);
 
 onMounted(async () => {
-  const { data } = await getViewCategories();
+  const { data } = await getCategoryActive();
   categories.value = data;
 });
 </script>

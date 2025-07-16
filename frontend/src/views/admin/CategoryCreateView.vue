@@ -1,5 +1,6 @@
 <template>
   <div>
+    <router-link to="/admin/categories" class="back-btn no-print">← Back to Categories</router-link>
     <h2>Create Category</h2>
     <form @submit.prevent="submit">
       <input type="file" @change="onFileChange" required />
@@ -73,5 +74,21 @@ button {
 
 button:hover {
   background-color: #6920d4;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  background-color: #eee;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #ddd;
 }
 </style>

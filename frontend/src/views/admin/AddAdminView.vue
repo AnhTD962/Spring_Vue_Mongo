@@ -1,5 +1,6 @@
 <template>
   <div>
+    <router-link to="/admin/users" class="back-btn no-print">← Back to Users</router-link>
     <h2>Add Admin</h2>
     <form @submit.prevent="submit">
       <input v-model="user.name" type="text" placeholder="Name" required />
@@ -104,6 +105,22 @@ p {
   text-align: center;
   margin-top: 1rem;
   font-weight: bold;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  background-color: #eee;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #ddd;
 }
 </style>
 

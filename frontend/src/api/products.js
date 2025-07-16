@@ -1,15 +1,11 @@
 import api from "./axios";
 
-export function getProducts(params) {
-    return api.get("/admin/products", { params });
+export function getProducts() {
+    return api.get("/products");
 }
 
 export function createProduct(payload) {
-    return api.post("/admin/products", payload);
-}
-
-export function getProduct(id){
-    return api.get(`/admin/products/${id}`);
+    return api.post("/products", payload);
 }
 
 export function updateProduct(id, product, imageFile) {
@@ -20,17 +16,21 @@ export function updateProduct(id, product, imageFile) {
   if (imageFile) {
     formData.append("file", imageFile);
   }
-  return api.put(`/admin/products/${id}`, formData);
+  return api.put(`/products/${id}`, formData);
 }
 
 export function deleteProduct(id) {
-    return api.delete(`/admin/products/${id}`);
+    return api.delete(`/products/${id}`);
 }
 
 export function getViewProducts(){
-    return api.get("/products");
+    return api.get("/products/all");
 }
 
-export function getViewProductDetail(id, payload){
-    return api.get(`/products/${id}`, payload);
+export function getViewProductDetail(id){
+    return api.get(`/products/id/${id}`);
+}
+
+export function getProductByCategory(name) {
+  return api.get(`/products/category/${name}`);
 }

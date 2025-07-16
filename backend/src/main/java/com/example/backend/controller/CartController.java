@@ -7,12 +7,14 @@ import com.example.backend.model.entity.User;
 import com.example.backend.service.CartService;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/user/cart")
+@PreAuthorize("hasRole('ROLE_USER')")
+@RequestMapping("/api/cart")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CartController {
 
@@ -38,10 +40,9 @@ public class CartController {
     }
 
     @PutMapping("/{cartId}")
-    public String updateCartQuantity(@PathVariable String cartId,
+    public void updateCartQuantity(@PathVariable String cartId,
                                      @RequestParam int quantity) {
         cartService.updateCartQuantityById(cartId, quantity);
-        return "Cart quantity updated successfully";
     }
 
     @GetMapping("/count")
@@ -51,8 +52,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{cartId}")
-    public String deleteCartById(@PathVariable String cartId) {
+    public void deleteCartById(@PathVariable String cartId) {
         cartService.deleteCartById(cartId);
-        return "Cart item deleted successfully";
     }
 }

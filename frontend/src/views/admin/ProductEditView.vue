@@ -44,7 +44,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { getProduct, updateProduct } from "../../api/products";
+import { getViewProductDetail, updateProduct } from "../../api/products";
 import { getCategoryActive } from "@/api/categories";
 
 const router = useRouter();
@@ -57,7 +57,7 @@ const imagePreview = ref("/default-product.jpg");
 
 onMounted(async () => {
   const [{ data: productData }, { data: categoryData }] = await Promise.all([
-    getProduct(route.params.id),
+    getViewProductDetail(route.params.id),
     getCategoryActive()
   ]);
   product.value = productData;

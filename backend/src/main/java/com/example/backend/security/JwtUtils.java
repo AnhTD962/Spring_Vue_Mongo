@@ -9,7 +9,7 @@ import java.util.Date;
 public class JwtUtils {
 
     private final String jwtSecret = "8MAZT+b6Hzja4l0eiPfm6c0a3bvTkLz3ib+cetoO/tA=";
-    private final long accessTokenExpirationMs = 15 * 60 * 1000; // 15 phút
+    private final long accessTokenExpirationMs = 60 * 60 * 1000; // 15 phút
     private final long refreshTokenExpirationMs = 7 * 24 * 60 * 60 * 1000; // 7 ngày
 
     public String generateAccessToken(String email, String role) {

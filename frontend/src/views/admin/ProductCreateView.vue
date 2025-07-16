@@ -1,5 +1,6 @@
 <template>
   <div>
+    <router-link to="/admin/products" class="back-btn no-print">← Back to Products</router-link>
     <h2>Create Product</h2>
     <form @submit.prevent="submit">
       <input v-model="product.title" placeholder="Name" required />
@@ -121,5 +122,21 @@ button {
 
 button:hover {
   background-color: #6920d4;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  background-color: #eee;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #ddd;
 }
 </style>

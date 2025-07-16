@@ -14,6 +14,8 @@ public interface OrderService {
 
     List<Order> getAllOrders();
 
+    String bulkUpdateByIds(List<String> ids, String newStatusStr);
+
     Order getOrderOrThrow(String orderId);
 
     String updateOrderStatusOrThrow(String orderId, Integer statusId);

@@ -1,5 +1,6 @@
 <template>
   <div v-if="order" class="order-detail-wrapper">
+    <router-link to="/admin/orders" class="back-btn no-print">← Back to Orders</router-link>
     <div class="order-card" id="print-area">
       <h2>Order Detail</h2>
 
@@ -23,6 +24,7 @@
         <table class="order-items">
           <thead>
             <tr>
+              <th>Image</th>
               <th>Product</th>
               <th>Quantity</th>
               <th>Price</th>
@@ -31,6 +33,9 @@
           </thead>
           <tbody>
             <tr v-for="item in order.items" :key="item.product.id">
+              <td>
+                <img :src="`/uploads/product_img/${item.product.image}`" alt="Product Image" class="product-image">
+              </td>
               <td>{{ item.product.title }}</td>
               <td>{{ item.quantity }}</td>
               <td>${{ item.price.toFixed(2) }}</td>
@@ -124,6 +129,14 @@ h3 {
   background-color: #fafafa;
 }
 
+.product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
 .print-btn {
   margin-top: 1.5rem;
   padding: 0.6rem 1.2rem;
@@ -137,6 +150,22 @@ h3 {
 
 .print-btn:hover {
   background-color: #6920d4;
+}
+
+.back-btn {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  background-color: #eee;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #ddd;
 }
 
 /* Hide non-printable elements */

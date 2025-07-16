@@ -15,8 +15,15 @@
       </label>
     </div>
 
+    <!-- 📂 Bulk Update Button -->
+    <div class="bulk-update">
+      <button @click="bulkUpdateFilteredOrders" :disabled="!filteredOrders || filteredOrders.length === 0">
+        Bulk Update Filtered Orders
+      </button>
+    </div>
+
     <!-- 📋 Order Table -->
-    <table v-if="paginatedOrders.length" class="orders-table">
+    <table v-if="paginatedOrders && paginatedOrders.length" class="orders-table">
       <thead>
         <tr>
           <th>Order ID</th>
@@ -62,9 +69,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { getOrders, updateOrderStatus } from "../../api/orders";
+import { getOrders, updateOrderStatus, bulkUpdateStatusByIds } from "../../api/orders";
 
-// 🧾 Status enums
 const statusOptions = {
   1: "IN_PROGRESS",
   2: "ORDER_RECEIVED",
@@ -89,6 +95,12 @@ function getStatusIdByName(enumName) {
   return Object.entries(statusOptions).find(([, name]) => name === enumName)?.[0] ?? null;
 }
 
+function getNextStatus(current) {
+  const ids = Object.keys(statusOptions);
+  const index = ids.findIndex(id => statusOptions[id] === current);
+  return index >= 0 && index + 1 < ids.length ? statusOptions[ids[index + 1]] : null;
+}
+
 function filteredStatusOptions(currentEnum) {
   const currentId = parseInt(getStatusIdByName(currentEnum));
   return Object.fromEntries(
@@ -96,26 +108,24 @@ function filteredStatusOptions(currentEnum) {
   );
 }
 
-// 🔄 Refs
 const allOrders = ref([]);
 const tempStatus = ref({});
 const statusFilter = ref("");
-
-// 📄 Pagination
 const currentPage = ref(0);
 const pageSize = ref(5);
 
 const filteredOrders = computed(() => {
+  if (!allOrders.value) return [];
   let orders = [...allOrders.value];
   if (statusFilter.value) {
     orders = orders.filter(o => o.status === statusFilter.value);
   }
-  return orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // latest first
+  return orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
 });
 
 const totalPages = computed(() => Math.ceil(filteredOrders.value.length / pageSize.value));
-
 const paginatedOrders = computed(() => {
+  if (!filteredOrders.value) return [];
   const start = currentPage.value * pageSize.value;
   return filteredOrders.value.slice(start, start + pageSize.value);
 });
@@ -130,27 +140,45 @@ function prevPage() {
 async function changeStatus(order) {
   const newStatus = tempStatus.value[order.id];
   if (!newStatus || newStatus === order.status) return;
-
   try {
     const statusId = getStatusIdByName(newStatus);
     await updateOrderStatus(order.id, statusId);
     order.status = newStatus;
   } catch (e) {
     console.error(`Failed to update order ${order.orderId}`, e);
-    tempStatus.value[order.id] = order.status; // revert
+    tempStatus.value[order.id] = order.status;
+  }
+}
+
+async function bulkUpdateFilteredOrders() {
+  const currentStatus = statusFilter.value;
+  if (!currentStatus) {
+    alert("Please filter a status first.");
+    return;
+  }
+  const nextStatus = getNextStatus(currentStatus);
+  if (!nextStatus) {
+    alert("No next status available.");
+    return;
+  }
+  const idsToUpdate = filteredOrders.value.map(o => o.id);
+  try {
+    await bulkUpdateStatusByIds(idsToUpdate, nextStatus);
+    alert(`Updated ${idsToUpdate.length} orders to ${statusLabels[nextStatus]}`);
+    await fetchOrders();
+  } catch (e) {
+    console.error("Bulk update failed", e);
+    alert("Bulk update failed");
   }
 }
 
 async function fetchOrders() {
   try {
     const { data } = await getOrders();
-    allOrders.value = data.content || [];
-
-    // Save statuses
+    allOrders.value = Array.isArray(data) ? data : [];
     allOrders.value.forEach(o => {
       tempStatus.value[o.id] = o.status;
     });
-
     currentPage.value = 0;
   } catch (e) {
     console.error("Failed to fetch orders", e);
@@ -179,7 +207,28 @@ h2 {
   margin: 0 auto 1rem;
 }
 
-.order-filter select {
+.bulk-update {
+  text-align: right;
+  margin: 1rem auto;
+  max-width: 1000px;
+}
+
+.bulk-update button {
+  padding: 8px 16px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bulk-update button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.order-filter select,
+select {
   padding: 0.4rem;
   font-size: 0.95rem;
   border-radius: 4px;
@@ -205,13 +254,6 @@ h2 {
 .orders-table th {
   background-color: #f0f0f0;
   font-weight: 600;
-}
-
-select {
-  padding: 0.4rem;
-  font-size: 0.95rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
 }
 
 .detail-link {

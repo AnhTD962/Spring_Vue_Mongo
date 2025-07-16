@@ -21,6 +21,7 @@
     <table class="categories-table" v-if="paginatedCategories.length">
       <thead>
         <tr>
+          <th>Image</th>
           <th>Name</th>
           <th>Status</th>
           <th>Actions</th>
@@ -28,6 +29,9 @@
       </thead>
       <tbody>
         <tr v-for="c in paginatedCategories" :key="c.id">
+          <td>
+            <img :src="`/uploads/category_img/${c.imageName}`" alt="Category Image" class="category-image" />
+          </td>
           <td>{{ c.name }}</td>
           <td>{{ c.isActive ? 'Active' : 'Inactive' }}</td>
           <td>
@@ -165,6 +169,14 @@ h2 {
 .categories-table th {
   background: #f0f0f0;
   font-weight: 600;
+}
+
+.category-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
 .edit-link {

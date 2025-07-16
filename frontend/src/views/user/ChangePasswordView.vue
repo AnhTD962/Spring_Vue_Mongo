@@ -14,7 +14,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { changeUserPassword } from "../../api/auth";
+import { changePassword } from "../../api/users";
 import { useAuthStore } from '../../store/auth';
 
 const router = useRouter();
@@ -35,7 +35,7 @@ async function change() {
   }
 
   try {
-    await changeUserPassword({
+    await changePassword({
       currentPassword: currentPassword.value,
       newPassword: newPassword.value,
     });

@@ -45,7 +45,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { getUserProfile, updateUserProfile } from "../../api/auth";
+import { getProfile, updateProfile } from "../../api/users";
 
 const profile = ref(null);
 const msg = ref("");
@@ -54,7 +54,7 @@ const selectedImg = ref(null);
 
 onMounted(async () => {
   try {
-    const { data } = await getUserProfile();
+    const { data } = await getProfile();
     profile.value = data;
     avatarPreview.value = data.profileImage
       ? `/uploads/profile_img/${data.profileImage}`
@@ -88,7 +88,7 @@ async function save() {
   }
 
   try {
-    await updateUserProfile(formData);
+    await updateProfile(formData);
     msg.value = "Profile updated!";
   } catch (e) {
     msg.value = "Failed to update profile.";

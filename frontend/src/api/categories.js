@@ -1,33 +1,25 @@
 import api from "./axios";
 
 export function getCategories() {
-    return api.get("/admin/categories");
+    return api.get("/categories");
 }
 
 export function getCategory(id) {
-    return api.get(`/admin/categories/${id}`);
+    return api.get(`/categories/${id}`);
 }
 
 export function getCategoryActive(){
-    return api.get(`/admin/categories/active`);
+    return api.get(`/categories/all`);
 }
 
 export function createCategory(payload) {
-    return api.post("/admin/categories", payload);
+    return api.post("/categories", payload);
 }
 
 export function updateCategory(id, payload) {
-    return api.put(`/admin/categories/${id}`, payload);
+    return api.put(`/categories/${id}`, payload);
 }
 
 export function deleteCategory(id) {
-    return api.delete(`/admin/categories/${id}`);
-}
-
-export function getViewCategories(){
-    return api.get('/categories');
-}
-
-export function getProductByCategory(name) {
-  return api.get(`/categories/${name}`);
+    return api.delete(`/categories/${id}`);
 }
