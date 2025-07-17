@@ -15,8 +15,16 @@ import java.io.UnsupportedEncodingException;
 @Component
 public class CommonUtil {
 
+    String msg = null;
     @Autowired
     private JavaMailSender mailSender;
+
+    public static String generateUrl(HttpServletRequest request) {
+
+        String siteUrl = request.getRequestURL().toString();
+
+        return siteUrl.replace(request.getServletPath(), "");
+    }
 
     public void sendWelcomeEmail(String recipientEmail, String name) throws Exception {
         MimeMessage message = mailSender.createMimeMessage();
@@ -50,15 +58,7 @@ public class CommonUtil {
         mailSender.send(message);
         return true;
     }
-
-    public static String generateUrl(HttpServletRequest request) {
-
-        String siteUrl = request.getRequestURL().toString();
-
-        return siteUrl.replace(request.getServletPath(), "");
-    }
-
-    String msg=null;;
+    ;
 
     public Boolean sendMailForProductOrder(Order order, String status) throws Exception {
         if (order == null || order.getUser() == null) {

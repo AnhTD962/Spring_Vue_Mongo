@@ -41,7 +41,7 @@ public class CartController {
 
     @PutMapping("/{cartId}")
     public void updateCartQuantity(@PathVariable String cartId,
-                                     @RequestParam int quantity) {
+                                   @RequestParam int quantity) {
         cartService.updateCartQuantityById(cartId, quantity);
     }
 

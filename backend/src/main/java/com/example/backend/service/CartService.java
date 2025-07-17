@@ -4,7 +4,6 @@ import com.example.backend.controller.dto.response.CartListResponseDTO;
 import com.example.backend.model.entity.Cart;
 
 import java.security.Principal;
-import java.util.List;
 
 public interface CartService {
 

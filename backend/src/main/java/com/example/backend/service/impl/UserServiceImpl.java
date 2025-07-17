@@ -9,7 +9,6 @@ import com.example.backend.model.entity.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtils;
 import com.example.backend.service.UserService;
-import com.example.backend.util.AppConstant;
 import com.example.backend.util.CommonUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,20 +28,19 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
-
     @Autowired
     private CommonUtil commonUtil;
 
@@ -58,7 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthResponseDTO  registerUser(User user, MultipartFile avatar) {
+    public AuthResponseDTO registerUser(User user, MultipartFile avatar) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }

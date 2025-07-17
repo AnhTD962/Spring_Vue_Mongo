@@ -76,8 +76,6 @@ public class CartServiceImpl implements CartService {
     }
 
 
-
-
     @Override
     public CartListResponseDTO getCartWithTotal(String userId) {
         List<Cart> carts = cartRepository.findByUserId(userId);

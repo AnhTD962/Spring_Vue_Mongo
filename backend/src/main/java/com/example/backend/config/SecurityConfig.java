@@ -23,6 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -32,9 +35,6 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return new UserDetailsServiceImpl();
     }
-
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {

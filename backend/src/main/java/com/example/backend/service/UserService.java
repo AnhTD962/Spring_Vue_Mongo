@@ -34,7 +34,7 @@ public interface UserService {
 
     String changePassword(Principal principal, ChangePasswordRequestDTO request);
 
-    AuthResponseDTO  registerUser(User user, MultipartFile avatar);
+    AuthResponseDTO registerUser(User user, MultipartFile avatar);
 
     AuthResponseDTO login(SigninRequestDTO loginRequest);
 

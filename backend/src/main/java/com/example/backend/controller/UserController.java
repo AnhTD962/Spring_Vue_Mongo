@@ -1,8 +1,6 @@
 package com.example.backend.controller;
 
 import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
-import com.example.backend.exception.BusinessException;
-import com.example.backend.exception.NotFoundException;
 import com.example.backend.model.entity.User;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

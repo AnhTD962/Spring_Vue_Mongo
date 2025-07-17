@@ -1,7 +1,5 @@
 package com.example.backend.controller;
 
-import com.example.backend.exception.BusinessException;
-import com.example.backend.exception.NotFoundException;
 import com.example.backend.model.entity.Product;
 import com.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
