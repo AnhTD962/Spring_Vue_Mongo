@@ -3,11 +3,11 @@ package com.example.backend.controller;
 import com.example.backend.model.entity.Product;
 import com.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -18,8 +18,9 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all")
-    public List<Product> getProducts() {
-        return productService.findByIsActiveTrue();
+    public Page<Product> getProducts(@RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "5") int size) {
+        return productService.findByIsActiveTrue(PageRequest.of(page, size));
     }
 
     @GetMapping("/id/{id}")
@@ -28,8 +29,10 @@ public class ProductController {
     }
 
     @GetMapping("/category/{categoryName}")
-    public List<Product> getProductsByCategory(@PathVariable String categoryName) {
-        return productService.getProductsByCategory(categoryName);
+    public Page<Product> getProductsByCategory(@PathVariable String categoryName,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "5") int size) {
+        return productService.getProductsByCategory(categoryName, PageRequest.of(page, size));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -49,8 +52,10 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
-    public List<Product> getProducts(@RequestParam(defaultValue = "") String ch) {
-        return productService.getProducts(ch);
+    public Page<Product> getProducts(@RequestParam(defaultValue = "") String ch,
+                                     @RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "5") int size) {
+        return productService.getProducts(ch, PageRequest.of(page, size));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

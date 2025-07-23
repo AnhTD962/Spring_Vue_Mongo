@@ -5,6 +5,8 @@ import com.example.backend.controller.dto.request.SigninRequestDTO;
 import com.example.backend.controller.dto.response.AuthResponseDTO;
 import com.example.backend.model.entity.User;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
@@ -20,9 +22,9 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
-    List<User> getUsers(String role);
+    Page<User> getUsers(String role, Pageable pageable);
 
-    List<User> getAllUsers();
+    Page<User> getAllUsers(Pageable pageable);
 
     User updateUserProfile(Principal principal, User update, MultipartFile img);
 
@@ -40,7 +42,7 @@ public interface UserService {
 
     String forgotPasswordAndSendNewPassword(String email);
 
-    List<User> getUsersByType(Integer type);
+    Page<User> getUsersByType(Integer type, Pageable pageable);
 
     User getUserOrThrow(String id);
 

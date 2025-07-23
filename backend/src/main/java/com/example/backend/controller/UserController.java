@@ -4,6 +4,8 @@ import com.example.backend.controller.dto.request.ChangePasswordRequestDTO;
 import com.example.backend.model.entity.User;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +23,10 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
-    public List<User> getAllUsers(@RequestParam(value = "type", required = false) Integer type) {
-        return userService.getUsersByType(type);
+    public Page<User> getAllUsers(@RequestParam(value = "type", required = false) Integer type,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "5") int size) {
+        return userService.getUsersByType(type, PageRequest.of(page, size));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

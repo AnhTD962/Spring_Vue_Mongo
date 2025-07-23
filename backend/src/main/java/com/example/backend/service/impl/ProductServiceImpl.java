@@ -5,6 +5,8 @@ import com.example.backend.model.entity.Product;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,8 +77,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getProductsByCategory(String categoryName) {
-        return productRepository.findByCategory(categoryName);
+    public Page<Product> getProductsByCategory(String categoryName, Pageable pageable) {
+        return productRepository.findByCategory(categoryName, pageable);
     }
 
     @Override
@@ -122,25 +124,21 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(dbProduct);
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
-    }
-
-    public List<Product> searchProduct(String ch) {
-        return productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(ch, ch);
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 
     @Override
-    public List<Product> getProducts(String ch) {
-        if (ch == null || ch.trim().isEmpty()) {
-            return getAllProducts();
+    public Page<Product> getProducts(String searchTerm, Pageable pageable) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return productRepository.findAll(pageable);
         }
-        return searchProduct(ch);
+        return productRepository.findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(searchTerm, searchTerm, pageable);
     }
 
     @Override
-    public List<Product> findByIsActiveTrue() {
-        return productRepository.findByIsActiveTrue();
+    public Page<Product> findByIsActiveTrue(Pageable pageable) {
+        return productRepository.findByIsActiveTrue(pageable);
     }
 
 }

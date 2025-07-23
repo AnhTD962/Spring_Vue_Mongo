@@ -1,18 +1,18 @@
 package com.example.backend.repository;
 
 import com.example.backend.model.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-
-import java.util.List;
 
 public interface ProductRepository extends MongoRepository<Product, String> {
 
-    List<Product> findByIsActiveTrue();
+    Page<Product> findByIsActiveTrue(Pageable pageable);
 
-    List<Product> findAll();
+    Page<Product> findAll(Pageable pageable);
 
-    List<Product> findByCategory(String categoryName);
+    Page<Product> findByCategory(String category, Pageable pageable);
 
-    List<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String ch, String ch2);
+    Page<Product> findByTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(String title, String category, Pageable pageable);
 
 }

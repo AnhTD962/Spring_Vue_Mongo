@@ -12,6 +12,8 @@ import com.example.backend.service.UserService;
 import com.example.backend.util.CommonUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -134,13 +136,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override
-    public List<User> getUsers(String role) {
-        return userRepository.findByRole(role);
+    public Page<User> getUsers(String role, Pageable pageable) {
+        return userRepository.findByRole(role, pageable);
     }
 
     @Override
@@ -317,12 +319,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsersByType(Integer type) {
-        if (type == null) return getAllUsers();
+    public Page<User> getUsersByType(Integer type, Pageable pageable) {
+        if (type == null) return getAllUsers(pageable);
+
         return switch (type) {
-            case 1 -> getUsers("ROLE_USER");
-            case 2 -> getUsers("ROLE_ADMIN");
-            default -> getAllUsers();
+            case 1 -> userRepository.findByRole("ROLE_USER", pageable);
+            case 2 -> userRepository.findByRole("ROLE_ADMIN", pageable);
+            default -> getAllUsers(pageable);
         };
     }
 

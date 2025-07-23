@@ -3,6 +3,8 @@ package com.example.backend.service;
 import com.example.backend.controller.dto.request.OrderRequestDTO;
 import com.example.backend.controller.dto.response.OrderDetailResponseDTO;
 import com.example.backend.model.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.security.Principal;
 import java.util.List;
@@ -10,9 +12,9 @@ import java.util.List;
 public interface OrderService {
     void saveOrder(String userId, OrderRequestDTO orderRequest) throws Exception;
 
-    List<Order> getOrdersByUser(String userId);
+    Page<Order> getOrdersByUser(String userId, Pageable pageable);
 
-    List<Order> getAllOrders();
+    Page<Order> getAllOrders(Pageable pageable, String status);
 
     String bulkUpdateByIds(List<String> ids, String newStatusStr);
 
@@ -20,9 +22,7 @@ public interface OrderService {
 
     String updateOrderStatusOrThrow(String orderId, Integer statusId);
 
-    Order searchOrderByOrderId(String orderId);
-
-    List<Order> getOrdersByPrincipal(Principal principal);
+    Page<Order> getOrdersByPrincipal(Principal principal, Pageable pageable, String status);
 
     String placeOrderFromPrincipal(Principal principal, OrderRequestDTO request) throws Exception;
 

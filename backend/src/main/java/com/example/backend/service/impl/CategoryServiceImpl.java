@@ -4,6 +4,8 @@ import com.example.backend.model.entity.Category;
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,8 +51,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAllCategory() {
-        return categoryRepository.findAll();
+    public Page<Category> getAllCategory(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
     }
 
     @Override
@@ -74,8 +76,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAllActiveCategory() {
-        return categoryRepository.findByIsActiveTrue();
+    public Page<Category> getAllActiveCategory(Pageable pageable) {
+        return categoryRepository.findByIsActiveTrue(pageable);
     }
 
     @Override

@@ -12,6 +12,8 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.service.OrderService;
 import com.example.backend.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,14 +92,17 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<Order> getOrdersByUser(String userId) {
-        return orderRepository.findByUserIdOrderByOrderDateDesc(userId);
+    public Page<Order> getOrdersByUser(String userId, Pageable pageable) {
+        return orderRepository.findByUserIdOrderByOrderDateDesc(userId, pageable);
     }
 
 
     @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public Page<Order> getAllOrders(Pageable pageable, String status) {
+        if (status == null || status.isEmpty()) {
+            return orderRepository.findAll(pageable);
+        }
+        return orderRepository.findByStatusOrderByOrderDateDesc(pageable, status);
     }
 
     @Override
@@ -207,21 +212,16 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<Order> getOrdersByPrincipal(Principal principal) {
+    public Page<Order> getOrdersByPrincipal(Principal principal, Pageable pageable, String status) {
         if (principal == null) {
             throw new RuntimeException("Unauthorized");
         }
         User user = userRepository.findByEmail(principal.getName());
-        return getOrdersByUser(user.getId());
-    }
 
-    @Override
-    public Order searchOrderByOrderId(String orderId) {
-        if (orderId == null || orderId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Order ID is required");
+        if (status == null || status.isEmpty()) {
+            return orderRepository.findByUserIdOrderByOrderDateDesc(user.getId(), pageable);
+        } else {
+            return orderRepository.findByUserIdAndStatusOrderByOrderDateDesc(user.getId(), pageable, status);
         }
-
-        return orderRepository.findByOrderId(orderId.trim())
-                .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 }

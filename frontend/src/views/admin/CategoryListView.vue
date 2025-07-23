@@ -9,16 +9,11 @@
 
     <!-- 🔍 Search Bar -->
     <div class="search-bar">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Search by category name..."
-        class="search-input"
-      />
+      <input v-model="searchQuery" type="text" placeholder="Search by category name..." class="search-input" />
     </div>
 
     <!-- Categories Table -->
-    <table class="categories-table" v-if="paginatedCategories.length">
+    <table class="categories-table" v-if="filteredCategories.length">
       <thead>
         <tr>
           <th>Image</th>
@@ -28,15 +23,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="c in paginatedCategories" :key="c.id">
+        <tr v-for="c in filteredCategories" :key="c.id">
           <td>
             <img :src="`/uploads/category_img/${c.imageName}`" alt="Category Image" class="category-image" />
           </td>
           <td>{{ c.name }}</td>
           <td>{{ c.isActive ? 'Active' : 'Inactive' }}</td>
           <td>
-            <router-link :to="`/admin/categories/${c.id}/edit`" class="edit-link">Edit</router-link>
-            <button @click="remove(c.id)" class="delete-btn">Delete</button>
+            <router-link :to="`/admin/categories/${c.id}/edit`" class="icon-button" title="Edit">
+              <i class="fas fa-edit"></i>
+            </router-link>
+            <button @click="remove(c.id)" class="icon-button delete" title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
           </td>
         </tr>
       </tbody>
@@ -54,46 +53,46 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { getCategories, deleteCategory } from "../../api/categories";
 
-const allCategories = ref([]);
+const categories = ref([]);
 const searchQuery = ref("");
 const currentPage = ref(0);
+const totalPages = ref(0);
 const pageSize = 5;
+const filteredCategories = ref([]);
 
-// Filtered categories by search
-const filteredCategories = computed(() => {
-  const q = searchQuery.value.toLowerCase().trim();
-  if (!q) return allCategories.value;
-  return allCategories.value.filter(c =>
-    c.name.toLowerCase().includes(q)
-  );
-});
-
-// Pagination based on filtered list
-const totalPages = computed(() =>
-  Math.ceil(filteredCategories.value.length / pageSize)
-);
-
-const paginatedCategories = computed(() => {
-  const start = currentPage.value * pageSize;
-  return filteredCategories.value.slice(start, start + pageSize);
-});
-
-// Pagination handlers
-function nextPage() {
-  if (currentPage.value + 1 < totalPages.value) currentPage.value++;
-}
-function prevPage() {
-  if (currentPage.value > 0) currentPage.value--;
-}
-
-// Fetch and remove
 async function fetch() {
-  const { data } = await getCategories();
-  allCategories.value = data;
-  currentPage.value = 0;
+  const { data } = await getCategories(currentPage.value, pageSize);
+  categories.value = data.content; // Only current page data
+  totalPages.value = data.totalPages;
+  applySearch(); // search after update
+}
+
+function applySearch() {
+  const q = searchQuery.value.trim().toLowerCase();
+  if (!q) {
+    filteredCategories.value = categories.value;
+  } else {
+    filteredCategories.value = categories.value.filter(c =>
+      c.name.toLowerCase().includes(q)
+    );
+  }
+}
+
+function nextPage() {
+  if (currentPage.value + 1 < totalPages.value) {
+    currentPage.value++;
+    fetch();
+  }
+}
+
+function prevPage() {
+  if (currentPage.value > 0) {
+    currentPage.value--;
+    fetch();
+  }
 }
 
 async function remove(id) {
@@ -103,8 +102,13 @@ async function remove(id) {
   }
 }
 
+// Watch search input
+watch(searchQuery, applySearch);
+
+// Initial fetch
 onMounted(fetch);
 </script>
+
 
 <style scoped>
 .admin-categories-wrapper {
@@ -141,6 +145,7 @@ h2 {
   margin-bottom: 1rem;
   text-align: right;
 }
+
 .search-input {
   padding: 0.5rem 1rem;
   width: 300px;
@@ -179,22 +184,21 @@ h2 {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-.edit-link {
-  margin-right: 1rem;
-  color: #007bff;
-  text-decoration: underline;
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin: 0 5px;
+  color: #2196f3;
 }
 
-.delete-btn {
-  background-color: #d9534f;
-  color: #fff;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  cursor: pointer;
+.icon-button.delete {
+  color: #d9534f;
 }
-.delete-btn:hover {
-  background-color: #c9302c;
+
+.icon-button:hover {
+  opacity: 0.7;
 }
 
 .no-categories {
