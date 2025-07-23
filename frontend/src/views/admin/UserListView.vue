@@ -7,18 +7,13 @@
       <div class="filters">
         <label>
           Role:
-          <select v-model="filter" @change="fetchUsers">
+          <select v-model="selectedRole" @change="handleFilterChange">
             <option value="">All</option>
             <option value="1">User</option>
             <option value="2">Admin</option>
           </select>
         </label>
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="Search name or email..."
-          class="search-input"
-        />
+        <input type="text" v-model="searchInput" placeholder="Search..." class="search-input" />
       </div>
 
       <router-link to="/admin/add-new-admin">
@@ -27,9 +22,10 @@
     </div>
 
     <!-- Users Table -->
-    <table class="users-table" v-if="paginatedUsers.length">
+    <table class="users-table">
       <thead>
         <tr>
+          <th>#</th>
           <th>Photo</th>
           <th>Name</th>
           <th>Email</th>
@@ -39,87 +35,104 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="u in paginatedUsers" :key="u.id">
+        <tr v-for="(user, index) in filteredUsers" :key="user.id">
+          <td>{{ index + 1 + currentPage * pageSize }}</td>
           <td>
-            <img :src="`/uploads/profile_img/${u.profileImage}`" alt="Profile" />
+            <img :src="`/uploads/profile_img/${user.profileImage}`" alt="Profile" />
           </td>
-          <td>{{ u.name }}</td>
-          <td>{{ u.email }}</td>
-          <td>{{ u.role }}</td>
-          <td :style="{ color: u.isEnable ? 'green' : 'red' }">
-            {{ u.isEnable ? 'Active' : 'Inactive' }}
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td :style="{ color: user.isEnable ? 'green' : 'red' }">
+            {{ user.isEnable ? 'Active' : 'Inactive' }}
           </td>
           <td>
-            <button @click="toggleStatus(u)">
-              {{ u.isEnable ? 'Deactivate' : 'Activate' }}
+            <button @click="changeStatus(user)">
+              {{ user.isEnable ? 'Deactivate' : 'Activate' }}
             </button>
           </td>
+        </tr>
+        <tr v-if="filteredUsers.length === 0">
+          <td colspan="7">No users found</td>
         </tr>
       </tbody>
     </table>
 
-    <!-- No Users -->
-    <div v-else class="no-users">No users found.</div>
-
     <!-- Pagination -->
     <div class="pagination" v-if="totalPages > 1">
       <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
-      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <span>Page {{ currentPage + 1 }} / {{ totalPages }}</span>
       <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">Next</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { getUsers, toggleUserStatus } from "../../api/users";
+import { ref, computed, onMounted, watch } from 'vue';
+import { getUsers, toggleUserStatus } from '@/api/users';
 
-const allUsers = ref([]);
-const filter = ref("");
-const searchQuery = ref("");
-const currentPage = ref(0);
-const pageSize = 5;
+const users = ref([])
+const currentPage = ref(0)
+const totalPages = ref(0)
+const pageSize = 5
+const selectedRole = ref('')
+const searchInput = ref('')
 
-// Filtered by name/email
+const loadUsers = async () => {
+  try {
+    const res = await getUsers(currentPage.value, pageSize, selectedRole.value)
+    users.value = res.content
+    totalPages.value = res.page.totalPages
+  } catch (e) {
+    console.error('Failed to load users:', e)
+  }
+}
+
+const changeStatus = async (user) => {
+  try {
+    await toggleUserStatus(user.id, !user.isEnable)
+    user.isEnable = !user.isEnable // Optimistic UI update
+  } catch (e) {
+    console.error('Failed to change user status:', e)
+  }
+}
+
 const filteredUsers = computed(() => {
-  const q = searchQuery.value.toLowerCase().trim();
-  if (!q) return allUsers.value;
-  return allUsers.value.filter(
-    (u) =>
-      u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+  const search = searchInput.value.toLowerCase();
+  if (!search) return users.value;
+
+  return users.value.filter(user =>
+    user.name.toLowerCase().includes(search) ||
+    user.email.toLowerCase().includes(search)
   );
 });
 
-const totalPages = computed(() =>
-  Math.ceil(filteredUsers.value.length / pageSize)
-);
-
-const paginatedUsers = computed(() => {
-  const start = currentPage.value * pageSize;
-  return filteredUsers.value.slice(start, start + pageSize);
-});
-
-function nextPage() {
-  if (currentPage.value + 1 < totalPages.value) currentPage.value++;
+const handleFilterChange = () => {
+  currentPage.value = 0
+  loadUsers()
 }
 
-function prevPage() {
-  if (currentPage.value > 0) currentPage.value--;
+const nextPage = () => {
+  if (currentPage.value + 1 < totalPages.value) {
+    currentPage.value++
+    loadUsers()
+  }
 }
 
-async function fetchUsers() {
-  const { data } = await getUsers(filter.value);
-  allUsers.value = data;
-  currentPage.value = 0;
+const prevPage = () => {
+  if (currentPage.value > 0) {
+    currentPage.value--
+    loadUsers()
+  }
 }
 
-async function toggleStatus(user) {
-  await toggleUserStatus(user.id, !user.isEnable);
-  await fetchUsers();
-}
-
-onMounted(fetchUsers);
+onMounted(() => {
+  loadUsers()
+})
 </script>
+
+
+
 
 <style scoped>
 .admin-users-wrapper {

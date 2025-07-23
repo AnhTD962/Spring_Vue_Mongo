@@ -9,12 +9,7 @@
 
     <!-- 🔍 Search Bar -->
     <div class="search-bar">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Search by title or description..."
-        class="search-input"
-      />
+      <input v-model="searchQuery" type="text" placeholder="Search by title or description..." class="search-input" />
     </div>
 
     <!-- Product Table -->
@@ -36,11 +31,8 @@
         <tbody>
           <tr v-for="p in filteredProducts" :key="p.id">
             <td>
-              <img
-                :src="p.image ? `/uploads/product_img/${p.image}` : '/default-product.png'"
-                alt="product image"
-                class="product-thumbnail"
-              />
+              <img :src="p.image ? `/uploads/product_img/${p.image}` : '/default-product.png'" alt="product image"
+                class="product-thumbnail" />
             </td>
             <td>{{ p.title }}</td>
             <td>{{ p.description }}</td>
@@ -50,12 +42,22 @@
             <td>{{ p.discount }}%</td>
             <td>{{ p.isActive ? 'Yes' : 'No' }}</td>
             <td>
-              <router-link :to="`/admin/products/${p.id}/edit`" class="edit-link">Edit</router-link>
-              <button @click="remove(p.id)" class="delete-btn">Delete</button>
+              <router-link :to="`/admin/products/${p.id}/edit`" class="icon-button" title="Edit">
+                <i class="fas fa-edit"></i>
+              </router-link>
+              <button @click="remove(p.id)" class="icon-button delete" title="Delete">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
+      <!-- Pagination -->
+      <div class="pagination" v-if="totalPages > 1">
+        <button :disabled="currentPage === 0" @click="fetch(currentPage - 1)">Previous</button>
+        <span>Page {{ currentPage + 1 }} / {{ totalPages }}</span>
+        <button :disabled="currentPage === totalPages - 1" @click="fetch(currentPage + 1)">Next</button>
+      </div>
     </div>
 
     <!-- No Results -->
@@ -69,11 +71,15 @@ import { getProducts, deleteProduct } from '../../api/products'
 
 const products = ref([])
 const searchQuery = ref('')
+const currentPage = ref(0)
+const totalPages = ref(0)
 
 // Fetch data
-async function fetch() {
-  const { data } = await getProducts()
-  products.value = data
+async function fetch(page = 0) {
+  const { data } = await getProducts(page, 5)
+  products.value = data.content;
+  totalPages.value = data.totalPages;
+  currentPage.value = data.number;
 }
 onMounted(fetch)
 
@@ -121,6 +127,7 @@ h2 {
   text-decoration: none;
   font-weight: bold;
 }
+
 .create-link:hover {
   background: #6920d4;
 }
@@ -129,6 +136,7 @@ h2 {
   margin-bottom: 1rem;
   text-align: right;
 }
+
 .search-input {
   padding: 0.5rem 1rem;
   width: 300px;
@@ -170,23 +178,21 @@ h2 {
   font-weight: 600;
 }
 
-.edit-link {
-  color: #007bff;
-  text-decoration: underline;
-  margin-right: 1rem;
-}
-
-.delete-btn {
-  padding: 0.4rem 0.8rem;
-  background-color: #d9534f;
-  color: #fff;
+.icon-button {
+  background: none;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  font-size: 1.2rem;
+  margin: 0 5px;
+  color: #2196f3;
 }
 
-.delete-btn:hover {
-  background-color: #c9302c;
+.icon-button.delete {
+  color: #d9534f;
+}
+
+.icon-button:hover {
+  opacity: 0.7;
 }
 
 .no-products {

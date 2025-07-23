@@ -3,22 +3,42 @@
     <router-link to="/admin/products" class="back-btn no-print">← Back to Products</router-link>
     <h2>Create Product</h2>
     <form @submit.prevent="submit">
-      <input v-model="product.title" placeholder="Name" required />
-      <input v-model="product.description" placeholder="Description" required />
+      <div>Product name:
+        <input v-model="product.title" placeholder="Name" required />
+      </div>
 
-      <select v-model="product.category" required>
-        <option disabled value="">Select category</option>
-        <option v-for="cat in categories" :key="cat.id" :value="cat.name">
-          {{ cat.name }}
-        </option>
-      </select>
+      <div>Description:
+        <input v-model="product.description" placeholder="Description" required />
+      </div>
 
-      <input v-model.number="product.price" type="number" placeholder="Price" required />
-      <input v-model.number="product.stock" type="number" placeholder="Stock" required />
-      <input type="file" @change="e => imageFile.value = e.target.files[0]" required />
+      <div>Category:
+        <select v-model="product.category" required>
+          <option disabled value="">Select category</option>
+          <option v-for="cat in categories" :key="cat.id" :value="cat.name">
+            {{ cat.name }}
+          </option>
+        </select>
+      </div>
 
-      <input v-model.number="product.discount" type="number" placeholder="Discount (%)" />
-      <input :value="product.discountPrice.toFixed(2)" placeholder="Discount Price" readonly />
+      <div>Price:
+        <input v-model.number="product.price" type="number" placeholder="Price" required />
+      </div>
+
+      <div>Stock:
+        <input v-model.number="product.stock" type="number" placeholder="Stock" required />
+      </div>
+
+      <div>Image:
+        <input type="file" @change="e => imageFile.value = e.target.files[0]" required />
+      </div>
+
+      <div>Discount (%):
+        <input v-model.number="product.discount" type="number" placeholder="Discount (%)" />
+      </div>
+
+      <div>Discount Price:
+        <input :value="product.discountPrice.toFixed(2)" placeholder="Discount Price" readonly />
+      </div>
 
       <button type="submit">Create</button>
     </form>
@@ -94,6 +114,18 @@ form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+form div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+form div>label,
+form div>input,
+form div>select {
+  width: 100%;
 }
 
 input,

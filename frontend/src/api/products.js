@@ -1,7 +1,7 @@
 import api from "./axios";
 
-export function getProducts() {
-    return api.get("/products");
+export function getProducts(page = 0, size = 6) {
+    return api.get(`/products?page=${page}&size=${size}`);
 }
 
 export function createProduct(payload) {
@@ -23,14 +23,14 @@ export function deleteProduct(id) {
     return api.delete(`/products/${id}`);
 }
 
-export function getViewProducts(){
-    return api.get("/products/all");
+export function getViewProducts(page = 0, size = 6){
+    return api.get(`/products/all?page=${page}&size=${size}`);
 }
 
 export function getViewProductDetail(id){
     return api.get(`/products/id/${id}`);
 }
 
-export function getProductByCategory(name) {
-  return api.get(`/products/category/${name}`);
+export function getProductByCategory(name, page = 0, size = 6) {
+  return api.get(`/products/category/${name}?page=${page}&size=${size}`);
 }

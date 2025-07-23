@@ -1,56 +1,71 @@
 <template>
-  <div class="orders-wrapper">
+  <div class="my-orders-container">
     <h2>My Orders</h2>
-
-    <!-- 🔍 Filter by Status -->
-    <div class="filter-bar">
-      <label>
-        Filter by Status:
-        <select v-model="selectedStatus" @change="resetPagination">
+    <div v-if="totalPages > 0">
+      <div class="filter-section">
+        <label for="statusFilter">Filter by status:</label>
+        <select id="statusFilter" v-model="selectedStatus">
           <option value="">All</option>
-          <option v-for="(label, value) in statusLabels" :key="value" :value="value">
+          <option v-for="(label, key) in statusLabels" :key="key" :value="key">
             {{ label }}
           </option>
         </select>
-      </label>
-    </div>
+      </div>
 
-    <div v-if="paginatedOrders.length" class="orders-table-container">
       <table class="orders-table">
         <thead>
           <tr>
             <th>#</th>
             <th>Order ID</th>
+            <th>Products</th>
             <th>Status</th>
-            <th>Details</th>
+            <th>Detail</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(o, index) in paginatedOrders" :key="o.id">
+          <tr v-if="orders.length === 0">
+            <td colspan="5">No orders found.</td>
+          </tr>
+          <tr v-for="(o, index) in orders" :key="o.id">
             <td>{{ index + 1 + currentPage * pageSize }}</td>
             <td>{{ o.orderId }}</td>
+            <td>
+              <ul>
+                <li v-for="item in o.items" :key="item.product.id">{{ item.product.title }}</li>
+              </ul>
+            </td>
             <td>{{ statusLabels[o.status] || o.status }}</td>
             <td>
-              <router-link :to="`/my-orders/${o.id}`" class="order-link">View</router-link>
+              <router-link :to="`/my-orders/${o.id}`"  class="icon-link" title="View Order">
+                <i class="fas fa-eye"></i>
+              </router-link>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
 
-    <div v-else class="no-orders">You haven't placed any orders yet.</div>
-
-    <div class="pagination" v-if="totalPages > 1">
-      <button @click="prevPage" :disabled="currentPage === 0">Prev</button>
-      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">Next</button>
+      <div class="pagination" v-if="totalPages > 1">
+        <button @click="prevPage" :disabled="currentPage === 0">Previous</button>
+        <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage + 1 >= totalPages">Next</button>
+      </div>
     </div>
+    
+  <div v-else>
+    <p>No orders found. <router-link to="/products">Browse products</router-link>.</p>
+  </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getMyOrders } from '../../api/orders'
+import { ref, watchEffect, watch } from 'vue'
+import { getMyOrders } from '@/api/orders'
+
+const orders = ref([])
+const selectedStatus = ref('')
+const currentPage = ref(0)
+const pageSize = 5
+const totalPages = ref(0)
 
 const statusLabels = {
   IN_PROGRESS: 'In Progress',
@@ -62,135 +77,100 @@ const statusLabels = {
   SUCCESS: 'Success'
 }
 
-const allOrders = ref([])
-const selectedStatus = ref('')
-const pageSize = 5
-const currentPage = ref(0)
-
-function resetPagination() {
+watch(selectedStatus, () => {
   currentPage.value = 0
-}
-
-const filteredOrders = computed(() => {
-  if (!selectedStatus.value) return allOrders.value
-  return allOrders.value.filter(o => o.status === selectedStatus.value)
 })
 
-const totalPages = computed(() =>
-  Math.ceil(filteredOrders.value.length / pageSize)
-)
-
-const paginatedOrders = computed(() => {
-  const start = currentPage.value * pageSize
-  return filteredOrders.value.slice(start, start + pageSize)
-})
-
-function nextPage() {
-  if (currentPage.value + 1 < totalPages.value) currentPage.value++
+const fetchOrders = async () => {
+  try {
+    const res = await getMyOrders(currentPage.value, pageSize, selectedStatus.value)
+    orders.value = res.data.content
+    totalPages.value = res.data.page?.totalPages || 1
+  } catch (err) {
+    console.error('Failed to fetch orders', err)
+  }
 }
 
-function prevPage() {
-  if (currentPage.value > 0) currentPage.value--
+watchEffect(() => {
+  fetchOrders()
+})
+
+const nextPage = () => {
+  if (currentPage.value + 1 < totalPages.value) {
+    currentPage.value++
+  }
 }
 
-onMounted(async () => {
-  const { data } = await getMyOrders()
-  allOrders.value = (data || []).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  )
-})
+const prevPage = () => {
+  if (currentPage.value > 0) {
+    currentPage.value--
+  }
+}
 </script>
 
 <style scoped>
-.orders-wrapper {
-  padding: 40px 20px;
-  min-height: 100vh;
-  background-color: #f9f9f9;
+.my-orders-container {
+  padding: 20px;
+  background-color: #f8f9fa;
 }
 
 h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-  font-size: 2rem;
+  margin-bottom: 16px;
   color: #333;
 }
 
-.filter-bar {
-  max-width: 900px;
-  margin: 0 auto 1rem;
-  text-align: right;
+.filter-section {
+  margin-bottom: 20px;
 }
 
-.filter-bar select {
+.filter-section select {
   padding: 6px 10px;
   font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-.orders-table-container {
-  overflow-x: auto;
-  max-width: 900px;
-  margin: 0 auto;
+  margin-left: 10px;
 }
 
 .orders-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  border-radius: 6px;
-  overflow: hidden;
+  margin-bottom: 20px;
 }
 
 .orders-table th,
 .orders-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-.orders-table th {
-  background-color: #f0f0f0;
-  font-weight: 600;
-  color: #555;
-}
-
-.orders-table td {
-  font-size: 0.95rem;
-  color: #333;
-}
-
-.order-link {
-  color: #7b2ff2;
-  font-weight: bold;
-  text-decoration: underline;
-}
-
-.no-orders {
+  padding: 12px;
+  border: 1px solid #ccc;
   text-align: center;
-  color: #777;
-  font-size: 1.1rem;
-  margin-top: 2rem;
+}
+
+.icon-link {
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin: 0 5px;
+  color: #2196f3;
+  margin: auto;
+}
+
+.icon-link:hover {
+  color: #1976d2;
 }
 
 .pagination {
-  text-align: center;
-  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .pagination button {
-  margin: 0 0.5rem;
   padding: 6px 12px;
-  background: #7b2ff2;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  font-size: 1rem;
   cursor: pointer;
 }
 
 .pagination button:disabled {
-  background-color: #ccc;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 </style>

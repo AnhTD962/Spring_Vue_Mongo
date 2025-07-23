@@ -14,22 +14,32 @@
         </label>
         <input id="product-image-input" type="file" accept="image/*" hidden @change="onImageChange" />
       </div>
-
-      <input v-model="product.title" placeholder="Title" required />
-      <input v-model="product.description" placeholder="Description" required />
-
+      <div>Product name:
+        <input v-model="product.title" placeholder="Title" required />
+      </div>
+      <div>Product description:
+        <input v-model="product.description" placeholder="Description" required />
+      </div>
+      <div>Product category:
       <select v-model="product.category" required>
         <option disabled value="">Select category</option>
         <option v-for="cat in categories" :key="cat.id" :value="cat.name">
           {{ cat.name }}
         </option>
       </select>
-
-      <input v-model.number="product.price" type="number" placeholder="Price" required />
-      <input v-model.number="product.discount" type="number" placeholder="Discount (%)" />
-      <input :value="product.discountPrice.toFixed(2)" placeholder="Discount Price" readonly />
-
-      <input v-model.number="product.stock" type="number" placeholder="Stock" required />
+      </div>
+      <div>Product price:
+        <input v-model.number="product.price" type="number" placeholder="Price" required />
+      </div>
+      <div>Product discount (%):
+        <input v-model.number="product.discount" type="number" placeholder="Discount (%)" />
+      </div>
+      <div>Product discount price:
+        <input :value="product.discountPrice.toFixed(2)" placeholder="Discount Price" readonly />
+      </div>
+      <div>Product stock:
+        <input v-model.number="product.stock" type="number" placeholder="Stock" required />
+      </div>
 
       <label>
         <input type="checkbox" v-model="product.isActive" />
@@ -111,6 +121,18 @@ form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+form div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+form div>label,
+form div>input,
+form div>select {
+  width: 100%;
 }
 
 input,

@@ -3,10 +3,22 @@
     <router-link to="/admin/users" class="back-btn no-print">← Back to Users</router-link>
     <h2>Add Admin</h2>
     <form @submit.prevent="submit">
-      <input v-model="user.name" type="text" placeholder="Name" required />
-      <input v-model="user.email" type="text" placeholder="Email" required />
-      <input v-model="user.password" type="password" placeholder="Password" required />
-      <input type="file" accept="image/*" @change="onFileChange" />
+      <div>
+        <label for="name">Name:</label>
+        <input v-model="user.name" type="text" id="name" placeholder="Name" required />
+      </div>
+      <div>
+        <label for="email">Email:</label>
+        <input v-model="user.email" type="email" id="email" placeholder="Email" required />
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input v-model="user.password" type="password" id="password" placeholder="Password" required /> 
+      </div>
+      <div>
+        <label for="image">Profile Image:</label>
+        <input type="file" id="image" accept="image/*" @change="onFileChange" />
+      </div>
       <button type="submit">Create</button>
     </form>
     <p v-if="errorMessage" style="color: red">{{ errorMessage }}</p>
@@ -50,7 +62,7 @@ async function submit() {
     router.push("/admin/users");
   } catch (err) {
     if (err.response && err.response.data) {
-      errorMessage.value = err.response.data; 
+      errorMessage.value = err.response.data;
     } else {
       errorMessage.value = "Failed to create admin. Please try again.";
     }
@@ -74,6 +86,18 @@ form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+form div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+form div>label,
+form div>input,
+form div>select {
+  width: 100%;
 }
 
 input[type="text"],
@@ -123,4 +147,3 @@ p {
   background-color: #ddd;
 }
 </style>
-

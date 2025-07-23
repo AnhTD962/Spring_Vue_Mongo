@@ -6,7 +6,7 @@
     <div class="order-filter">
       <label>
         Filter by Status:
-        <select v-model="statusFilter" @change="fetchOrders">
+        <select v-model="statusFilter" @change="handleFilter">
           <option value="">All</option>
           <option v-for="(label, key) in statusLabels" :key="key" :value="key">
             {{ label }}
@@ -17,13 +17,13 @@
 
     <!-- 📂 Bulk Update Button -->
     <div class="bulk-update">
-      <button @click="bulkUpdateFilteredOrders" :disabled="!filteredOrders || filteredOrders.length === 0">
+      <button @click="bulkUpdateFilteredOrders" :disabled="orders.length === 0">
         Bulk Update Filtered Orders
       </button>
     </div>
 
     <!-- 📋 Order Table -->
-    <table v-if="paginatedOrders && paginatedOrders.length" class="orders-table">
+    <table v-if="orders.length" class="orders-table">
       <thead>
         <tr>
           <th>Order ID</th>
@@ -34,24 +34,23 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="o in paginatedOrders" :key="o.id">
+        <tr v-for="o in orders" :key="o.id">
           <td>#{{ o.orderId }}</td>
           <td>${{ o.total.toFixed(2) }}</td>
           <td>{{ statusLabels[o.status] }}</td>
           <td>
             <select v-model="tempStatus[o.id]" @change="changeStatus(o)">
-              <option
-                v-for="(enumName, id) in filteredStatusOptions(o.status)"
-                :key="id"
-                :value="enumName"
-              >
+              <option v-for="(enumName, id) in filteredStatusOptions(o.status)" :key="id" :value="enumName">
                 {{ statusLabels[enumName] }}
               </option>
             </select>
           </td>
           <td>
-            <router-link :to="`/admin/orders/${o.orderId}`" class="detail-link">View</router-link>
+            <router-link :to="`/admin/orders/${o.orderId}`" class="icon-link" title="View Order">
+              <i class="fas fa-eye"></i>
+            </router-link>
           </td>
+
         </tr>
       </tbody>
     </table>
@@ -68,27 +67,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { getOrders, updateOrderStatus, bulkUpdateStatusByIds } from "../../api/orders";
+import { ref, onMounted, watch } from 'vue';
+import { getOrders, updateOrderStatus, bulkUpdateStatusByIds } from '../../api/orders';
 
 const statusOptions = {
-  1: "IN_PROGRESS",
-  2: "ORDER_RECEIVED",
-  3: "PRODUCT_PACKED",
-  4: "OUT_FOR_DELIVERY",
-  5: "DELIVERED",
-  6: "CANCELLED",
-  7: "SUCCESS"
+  1: 'IN_PROGRESS',
+  2: 'ORDER_RECEIVED',
+  3: 'PRODUCT_PACKED',
+  4: 'OUT_FOR_DELIVERY',
+  5: 'DELIVERED',
+  6: 'CANCELLED',
+  7: 'SUCCESS',
 };
 
 const statusLabels = {
-  IN_PROGRESS: "In Progress",
-  ORDER_RECEIVED: "Order Received",
-  PRODUCT_PACKED: "Product Packed",
-  OUT_FOR_DELIVERY: "Out for Delivery",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-  SUCCESS: "Success"
+  IN_PROGRESS: 'In Progress',
+  ORDER_RECEIVED: 'Order Received',
+  PRODUCT_PACKED: 'Product Packed',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
+  SUCCESS: 'Success',
 };
 
 function getStatusIdByName(enumName) {
@@ -108,33 +107,41 @@ function filteredStatusOptions(currentEnum) {
   );
 }
 
-const allOrders = ref([]);
+const orders = ref([]);
 const tempStatus = ref({});
-const statusFilter = ref("");
+const statusFilter = ref('');
 const currentPage = ref(0);
 const pageSize = ref(5);
+const totalPages = ref(0);
 
-const filteredOrders = computed(() => {
-  if (!allOrders.value) return [];
-  let orders = [...allOrders.value];
-  if (statusFilter.value) {
-    orders = orders.filter(o => o.status === statusFilter.value);
+async function fetchOrders() {
+  try {
+    const { data } = await getOrders(currentPage.value, pageSize.value, statusFilter.value);
+    orders.value = data.content || [];
+    totalPages.value = data.page?.totalPages || 0; // ✅ Fix here
+    orders.value.forEach(o => (tempStatus.value[o.id] = o.status));
+  } catch (e) {
+    console.error('Failed to fetch orders', e);
   }
-  return orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-});
+}
 
-const totalPages = computed(() => Math.ceil(filteredOrders.value.length / pageSize.value));
-const paginatedOrders = computed(() => {
-  if (!filteredOrders.value) return [];
-  const start = currentPage.value * pageSize.value;
-  return filteredOrders.value.slice(start, start + pageSize.value);
-});
+function handleFilter() {
+  currentPage.value = 0;
+  fetchOrders();
+}
 
 function nextPage() {
-  if (currentPage.value + 1 < totalPages.value) currentPage.value++;
+  if (currentPage.value + 1 < totalPages.value) {
+    currentPage.value++;
+    fetchOrders();
+  }
 }
+
 function prevPage() {
-  if (currentPage.value > 0) currentPage.value--;
+  if (currentPage.value > 0) {
+    currentPage.value--;
+    fetchOrders();
+  }
 }
 
 async function changeStatus(order) {
@@ -153,39 +160,34 @@ async function changeStatus(order) {
 async function bulkUpdateFilteredOrders() {
   const currentStatus = statusFilter.value;
   if (!currentStatus) {
-    alert("Please filter a status first.");
+    alert('Please filter a status first.');
     return;
   }
   const nextStatus = getNextStatus(currentStatus);
   if (!nextStatus) {
-    alert("No next status available.");
+    alert('No next status available.');
     return;
   }
-  const idsToUpdate = filteredOrders.value.map(o => o.id);
+  const idsToUpdate = orders.value.map(o => o.id);
   try {
     await bulkUpdateStatusByIds(idsToUpdate, nextStatus);
     alert(`Updated ${idsToUpdate.length} orders to ${statusLabels[nextStatus]}`);
-    await fetchOrders();
+    fetchOrders();
   } catch (e) {
-    console.error("Bulk update failed", e);
-    alert("Bulk update failed");
-  }
-}
-
-async function fetchOrders() {
-  try {
-    const { data } = await getOrders();
-    allOrders.value = Array.isArray(data) ? data : [];
-    allOrders.value.forEach(o => {
-      tempStatus.value[o.id] = o.status;
-    });
-    currentPage.value = 0;
-  } catch (e) {
-    console.error("Failed to fetch orders", e);
+    console.error('Bulk update failed', e);
+    alert('Bulk update failed');
   }
 }
 
 onMounted(fetchOrders);
+watch(statusFilter, () => {
+  currentPage.value = 0;
+  fetchOrders();
+});
+
+watch(currentPage, () => {
+  fetchOrders();
+});
 </script>
 
 <style scoped>
@@ -256,10 +258,17 @@ select {
   font-weight: 600;
 }
 
-.detail-link {
-  color: #7b2ff2;
-  font-weight: bold;
-  text-decoration: underline;
+.icon-link {
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin: 0 5px;
+  color: #2196f3;
+  margin: auto;
+}
+
+.icon-link:hover {
+  color: #1976d2;
 }
 
 .no-orders {

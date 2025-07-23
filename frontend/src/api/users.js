@@ -1,10 +1,15 @@
 import api from "./axios";
 
 // Admin actions
-export function getUsers(type = "") {
-  return api.get("/user", {
-    params: type ? { type } : {},
+export async function getUsers(page, size, type = '') {
+  const response = await api.get('/user', {
+    params: {
+      page,
+      size,
+      type,
+    },
   });
+  return response.data;
 }
 
 export function getUser(id) {

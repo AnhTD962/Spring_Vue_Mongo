@@ -3,8 +3,12 @@
     <router-link to="/admin/categories" class="back-btn no-print">← Back to Categories</router-link>
     <h2>Create Category</h2>
     <form @submit.prevent="submit">
-      <input type="file" @change="onFileChange" required />
-      <input v-model="category.name" placeholder="Name" required />
+      <div>Category Image:
+        <input type="file" @change="onFileChange" required />
+      </div>
+      <div>Category Name:
+        <input type="text" v-model="category.name" placeholder="Name" required />
+      </div>
       <button type="submit">Create</button>
     </form>
   </div>
@@ -52,6 +56,12 @@ form {
   flex-direction: column;
   gap: 1.2rem;
 }
+
+form div {
+  display: flex;
+  flex-direction: column;
+}
+
 
 input[type="text"],
 input[type="file"] {
