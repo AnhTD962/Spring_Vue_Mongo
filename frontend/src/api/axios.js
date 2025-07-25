@@ -2,7 +2,7 @@ import axios from "axios";
 import { refreshToken } from "./auth"; // Đã có trong api/auth.js
 
 const instance = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "/api",
   withCredentials: true, // cần nếu backend dùng cookie
 });
 

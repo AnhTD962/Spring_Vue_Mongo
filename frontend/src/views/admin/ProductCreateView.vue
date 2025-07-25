@@ -67,7 +67,7 @@ const imageFile = ref(null);
 
 onMounted(async () => {
   const res = await getCategoryActive();
-  categories.value = res.data;
+  categories.value = res.data.content;
 });
 
 watch(

@@ -71,7 +71,7 @@ onMounted(async () => {
     getCategoryActive()
   ]);
   product.value = productData;
-  categories.value = categoryData;
+  categories.value = categoryData.content;
 
   if (product.value.image) {
     imagePreview.value = `/uploads/product_img/${product.value.image}?t=${Date.now()}`;
