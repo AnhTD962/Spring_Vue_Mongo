@@ -15,7 +15,6 @@ import java.security.Principal;
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping("/api/cart")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CartController {
 
     @Autowired
