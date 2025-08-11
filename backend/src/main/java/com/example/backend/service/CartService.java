@@ -7,14 +7,14 @@ import java.security.Principal;
 
 public interface CartService {
 
-    public Cart saveCart(String productId, Integer quantity, Principal principal);
+    Cart saveCart(String productId, Integer quantity, Principal principal);
 
-    public CartListResponseDTO getCartWithTotal(String userId);
+    CartListResponseDTO getCartWithTotal(String userId);
 
-    public Integer getCountCart(String userId);
+    Integer getCountCart(String userId);
 
-    public void updateCartQuantityById(String cartId, int quantity);
+    void updateCartQuantityById(String cartId, int quantity);
 
-    public void deleteCartById(String cartId);
+    void deleteCartById(String cartId);
 
 }
